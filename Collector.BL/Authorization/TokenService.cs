@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Collector.BL.Entity;
 using Collector.BL.Extentions;
@@ -10,7 +11,6 @@ using Collector.DAO.Entities;
 using Collector.DAO.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Collector.BL.Authorization
 {
@@ -28,21 +28,26 @@ namespace Collector.BL.Authorization
 
         public async Task<object> RegisterAsync(RegisterDto entity)
         {
-            var foundedUser = await ( await _userService.GetAllAsync(user => user.Username == entity.Username || user.Email == entity.Email)).FirstOrDefaultAsync();
-            if (foundedUser != null)
-                throw new Exception("This username or(and) email is already in use");
+            var foundedUser =
+                 (_userService.GetAllAsync(user => user.Username == entity.Username || user.Email == entity.Email).Result).Any();
 
-            var newUser = new User()
+            //if (foundedUser)
+            //    throw new Exception("This username or(and) email is already in use");
+
+            var createdBy = (await (_userService.GetAllAsync(user => user.Username == "system").Result).FirstOrDefaultAsync()).ID;
+            Console.WriteLine("Created by:" + createdBy);
+
+            var newUser = new User
             {
                 Username = entity.Username,
                 Email = entity.Email,
                 Password = Enctypting.CreateMD5(entity.Password),
                 FirstName = entity.FirstName,
                 LastName = entity.LastName,
-                Role = Role.User
+                Role = Role.User,
+                CreatedBy = createdBy
             };
 
-            newUser.CreatedBy = (await (await _userService.GetAllAsync(user => user.Username == "system")).FirstOrDefaultAsync()).ID;
 
             await _userService.InsertAsync(newUser);
 

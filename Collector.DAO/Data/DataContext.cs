@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,20 +15,19 @@ namespace Collector.DAO.Data
         public DbSet<User> Users { get; set; }
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
-
+            
         }
 
-        //protected override void OnModelCreating(ModelBuilder modelBuilder)
-        //{
-        //    base.OnModelCreating(modelBuilder);
-        //}
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+        }
 
-        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSucces,
+        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             ChangeTracker.ApplyAuditInformation();
-
-            return await base.SaveChangesAsync(acceptAllChangesOnSucces, cancellationToken);
+            return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         }
     }
 }

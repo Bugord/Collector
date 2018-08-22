@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Collector.BL.Authorization;
 using Collector.DAO.Data;
+using Collector.DAO.Entities;
+using Collector.DAO.Repository;
+using Collector.Extentions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -67,6 +71,11 @@ namespace Collector
                 });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddRepository();
+            services.AddTransientServices();
+
+
             services.AddDbContext<DataContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Collector.DAO")));
 
         }
@@ -82,9 +91,10 @@ namespace Collector
             {
                 app.UseHsts();
             }
-            app.UseAuthentication();
-
             app.UseHttpsRedirection();
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+            app.UseAuthentication();
             app.UseMvc();
         }
     }
