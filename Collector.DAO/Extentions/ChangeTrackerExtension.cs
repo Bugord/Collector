@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Collector.DAO.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -22,12 +20,10 @@ namespace Collector.DAO.Extentions
                 {
                     case EntityState.Added:
                         baseAudit.Created = now;
-                        baseAudit.Modified = null;
                         break;
                     case EntityState.Modified:
                         baseAudit.Modified = now;
                         break;
-
                 }
             }
         }

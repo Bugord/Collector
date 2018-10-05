@@ -1,72 +1,120 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
-using Collector.BL.Authorization;
-using Collector.BL.Entity;
+using Collector.BL.Models.Authorization;
+using Collector.BL.Services.AuthorizationService;
 using Microsoft.AspNetCore.Mvc;
+using Collector.BL.Services.FriendListService;
+using Collector.BL.Services.UserService;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Collector.Controllers
 {
     [ApiController]
-    [Route("register")]
+    [Route("api")]
     public class AccountController : ControllerBase
     {
         private readonly ITokenService _tokenService;
+        private readonly IUserService _userService;
 
-        public AccountController(ITokenService tokenService)
+        public AccountController(ITokenService tokenService, IFriendListService friendService, IUserService userService)
         {
             _tokenService = tokenService;
+            _userService = userService;
         }
 
-        [HttpGet]
-        public string Get(LoginDto model)
+        [HttpPut("changePassword")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword(ChangePasswordDTO model)
         {
-            string messageToVisitor = "You are not logged.";
-            if (User.Identity.IsAuthenticated)
+            try
             {
-                messageToVisitor = $"Hello, {User.Claims.First().Value}.";
+                await _userService.ChangePasswordAsync(model);
+                return Ok();
             }
-
-            return DateTime.Now + "\n" + messageToVisitor;
-        }
-        // GET api/values
-        [HttpPost]
-        public async Task Post(LoginDto model)
-        {
-
-            var test = new RegisterDto()
+            catch (Exception e)
             {
-                Email = "email",
-                FirstName = "first name",
-                LastName = "last name",
-                Password = "password",
-                Username = "username"
-            };
-            await _tokenService.RegisterAsync(test);
+                return BadRequest(new {e.Message});
+            }
         }
 
-        // GET api/values/5
-        [HttpGet("{c}")]
-        public ActionResult<string> Get(int a, int b, int c)
+        [AllowAnonymous]
+        [HttpPut("resetPassword/{email}")]
+        public async Task<IActionResult> ResetPassword(string email)
         {
-           
-            return "value " + a + " " + b + " " + c;
+            try
+            {
+                await _userService.ResetPasswordAsync(email);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { e.Message });
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPut("resetPassword")]
+        public async Task<IActionResult> ResetPasswordToken(ResetPasswordDTO model)
+        {
+            try
+            {
+                await _userService.ResetPasswordTokenAsync(model);
+                return Ok();
+            }
+            catch (FormatException)
+            {
+                return BadRequest(new {Message = "Token is not valid"});
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { e.Message });
+            }
         }
 
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut("changeProfile")]
+        [Authorize]
+        public async Task<IActionResult> ChangeProfile(ChangeProfileDTO model)
         {
+            try
+            {
+                var data = await _userService.ChangeProfileAsync(model);
+                return Ok(data);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new {e.Message});
+            }
         }
 
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [AllowAnonymous]
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(RegisterDTO model)
         {
+            try
+            {
+                var data = await _tokenService.RegisterAsync(model);
+                return Ok(data);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new {e.Message});
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginDTO model)
+        {
+            try
+            {
+                var data = await _tokenService.LoginAsync(model);
+                return Ok(data);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new {e.Message});
+            }
         }
     }
 }
-

@@ -19,9 +19,106 @@ namespace Collector.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("Collector.DAO.Entities.Debt", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("Created");
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(256);
+
+                    b.Property<long>("FriendId");
+
+                    b.Property<bool>("IsOwnerDebter");
+
+                    b.Property<DateTime?>("Modified");
+
+                    b.Property<long?>("ModifiedBy");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100);
+
+                    b.Property<long>("OwnerId");
+
+                    b.Property<bool>("Synchronize");
+
+                    b.Property<float>("Value");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Debts");
+                });
+
+            modelBuilder.Entity("Collector.DAO.Entities.Friend", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("Created");
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<long?>("InviteId");
+
+                    b.Property<bool>("IsSynchronized");
+
+                    b.Property<DateTime?>("Modified");
+
+                    b.Property<long?>("ModifiedBy");
+
+                    b.Property<long>("OwnerId");
+
+                    b.Property<string>("OwnersName")
+                        .IsRequired()
+                        .HasMaxLength(100);
+
+                    b.Property<long?>("UserId");
+
+                    b.Property<string>("UsersName")
+                        .HasMaxLength(100);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Friends");
+                });
+
+            modelBuilder.Entity("Collector.DAO.Entities.Invite", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool>("Approved");
+
+                    b.Property<DateTime>("Created");
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<long>("FriendId");
+
+                    b.Property<DateTime?>("Modified");
+
+                    b.Property<long?>("ModifiedBy");
+
+                    b.Property<long>("OwnerId");
+
+                    b.Property<long>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Invites");
+                });
+
             modelBuilder.Entity("Collector.DAO.Entities.User", b =>
                 {
-                    b.Property<long>("ID")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -30,13 +127,16 @@ namespace Collector.Migrations
                     b.Property<long>("CreatedBy");
 
                     b.Property<string>("Email")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(100);
 
                     b.Property<string>("FirstName")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(100);
 
                     b.Property<string>("LastName")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(100);
 
                     b.Property<DateTime?>("Modified");
 
@@ -48,9 +148,10 @@ namespace Collector.Migrations
                     b.Property<int>("Role");
 
                     b.Property<string>("Username")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(100);
 
-                    b.HasKey("ID");
+                    b.HasKey("Id");
 
                     b.ToTable("Users");
                 });

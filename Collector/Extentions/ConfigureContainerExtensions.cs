@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Collector.BL.Authorization;
+﻿using Collector.BL.Services.AuthorizationService;
+using Collector.BL.Services.DebtsService;
+using Collector.BL.Services.EmailService;
+using Collector.BL.Services.FriendListService;
+using Collector.BL.Services.UserService;
 using Collector.DAO.Repository;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,8 +17,15 @@ namespace Collector.Extentions
 
         public static void AddTransientServices(this IServiceCollection serviceCollection)
         {
-            //serviceCollection.AddTransient<IPersonService, PersonService>();
-            serviceCollection.AddTransient<ITokenService, TokenService>();
+
+        }
+        public static void AddScopedServices(this IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddScoped<ITokenService, TokenService>();
+            serviceCollection.AddScoped<IFriendListService, FriendListService>();
+            serviceCollection.AddScoped<IDebtService, DebtService>();
+            serviceCollection.AddScoped<IEmailService, EmailService>();
+            serviceCollection.AddScoped<IUserService, UserService>();
         }
     }
 }
