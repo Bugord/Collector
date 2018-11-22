@@ -1,11 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data.SqlTypes;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using Collector.BL.Exceptions;
 using Collector.BL.Models.Authorization;
 using Collector.BL.Services.AuthorizationService;
 using Microsoft.AspNetCore.Mvc;
 using Collector.BL.Services.FriendListService;
 using Collector.BL.Services.UserService;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Collector.Controllers
 {
@@ -31,6 +39,22 @@ namespace Collector.Controllers
                 await _userService.ChangePasswordAsync(model);
                 return Ok();
             }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest(new
+                {
+                    Message =
+                        "The record you attempted to edit was modified by another user after you got the original value"
+                });
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(new {e.Message});
+            }
             catch (Exception e)
             {
                 return BadRequest(new {e.Message});
@@ -46,9 +70,40 @@ namespace Collector.Controllers
                 await _userService.ResetPasswordAsync(email);
                 return Ok();
             }
+            catch (SqlNullValueException e)
+            {
+                return NotFound(new {e.Message});
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest(new
+                {
+                    Message =
+                        "The record you attempted to edit was modified by another user after you got the original value"
+                });
+            }
             catch (Exception e)
             {
-                return BadRequest(new { e.Message });
+                return BadRequest(new {e.Message});
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPut("confirmEmail/{token}")]
+        public async Task<IActionResult> ConfirmEmail(string token)
+        {
+            try
+            {
+                await _userService.ConfirmEmail(token);
+                return Ok();
+            }
+            catch (ArgumentException)
+            {
+                return BadRequest(new {Message = "Token is not valid"});
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { Message = "Exception while email confirmation" });
             }
         }
 
@@ -61,25 +116,57 @@ namespace Collector.Controllers
                 await _userService.ResetPasswordTokenAsync(model);
                 return Ok();
             }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest(new
+                {
+                    Message =
+                        "The record you attempted to edit was modified by another user after you got the original value"
+                });
+            }
+            catch (SqlNullValueException e)
+            {
+                return NotFound(new { e.Message });
+            }
+            catch (SecurityTokenInvalidLifetimeException e)
+            {
+                return BadRequest(new {e.Message});
+            }
             catch (FormatException)
             {
                 return BadRequest(new {Message = "Token is not valid"});
             }
             catch (Exception e)
             {
-                return BadRequest(new { e.Message });
+                return BadRequest(new {e.Message});
             }
         }
 
 
         [HttpPut("changeProfile")]
         [Authorize]
-        public async Task<IActionResult> ChangeProfile(ChangeProfileDTO model)
+        public async Task<IActionResult> ChangeProfile([FromForm]ChangeProfileDTO model)
         {
             try
             {
                 var data = await _userService.ChangeProfileAsync(model);
                 return Ok(data);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest(new
+                {
+                    Message =
+                        "The record you attempted to edit was modified by another user after you got the original value"
+                });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch (AlreadyExistsException e)
+            {
+                return BadRequest(new { e.Message });
             }
             catch (Exception e)
             {
@@ -96,11 +183,40 @@ namespace Collector.Controllers
                 var data = await _tokenService.RegisterAsync(model);
                 return Ok(data);
             }
+            catch (AlreadyExistsException e)
+            {
+                return BadRequest(new {e.Message});
+            }
+            catch (ServerFailException e)
+            {
+                return BadRequest(new { e.Message });
+            }
             catch (Exception e)
             {
                 return BadRequest(new {e.Message});
             }
         }
+
+        //[HttpPost("UploadFiles")]
+        //public async Task<IActionResult> UploadFile(IFormFile file)
+        //{
+        //    if (file == null)
+        //        return BadRequest();
+
+        //    if (file.Length <= 0) return BadRequest();
+        //    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images", file.FileName);
+        //    file.CopyTo(new FileStream(path, FileMode.Create));
+        //    return Ok();
+        //}
+
+        //private string GetUniqueFileName(string fileName)
+        //{
+        //    fileName = Path.GetFileName(fileName);
+        //    return Path.GetFileNameWithoutExtension(fileName)
+        //           + "_"
+        //           + Guid.NewGuid().ToString().Substring(0, 4)
+        //           + Path.GetExtension(fileName);
+        //}
 
         [AllowAnonymous]
         [HttpPost("login")]
@@ -110,6 +226,10 @@ namespace Collector.Controllers
             {
                 var data = await _tokenService.LoginAsync(model);
                 return Ok(data);
+            }
+            catch (AuthenticationFailException e)
+            {
+                return BadRequest(new { e.Message });
             }
             catch (Exception e)
             {

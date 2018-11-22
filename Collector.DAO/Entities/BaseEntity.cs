@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Collector.DAO.Entities
 {
@@ -9,5 +10,7 @@ namespace Collector.DAO.Entities
         public DateTime Created { get; set; }
         public long? ModifiedBy { get; set; }
         public DateTime? Modified { get; set; }
+        [Timestamp]       
+        public byte[] RowVersion { get; set; }
     }
 }

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using Collector.BL.Models.Authorization;
+using Collector.BL.Models.FriendList;
 
 namespace Collector.BL.Models.Debt
 {
@@ -13,5 +16,8 @@ namespace Collector.BL.Models.Debt
         public bool IsOwner { get; set; }
         public DateTime Created { get; set; }
         public bool IsOwnerDebter { get; set; }
+        public byte[] RowVersion { get; set; }
+        public DateTime? DateOfOverdue { get; set; }
+        public bool IsClosed { get; set; }
     }
 }

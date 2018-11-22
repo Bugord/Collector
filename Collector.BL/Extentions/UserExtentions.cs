@@ -1,5 +1,6 @@
 ﻿using Collector.BL.Models.Authorization;
 using Collector.DAO.Entities;
+using static System.String;
 
 namespace Collector.BL.Extentions
 {
@@ -12,7 +13,9 @@ namespace Collector.BL.Extentions
                 Email = user.Email,
                 Username = user.Username,
                 LastName = user.LastName,
-                FirstName = user.FirstName
+                FirstName = user.FirstName,
+                UserRole = user.Role.ToString(),
+                AvatarUrl = user.AratarUrl ?? "images/defaultAvatar.png"
             };
         }
 
@@ -32,10 +35,14 @@ namespace Collector.BL.Extentions
 
         public static User UpdateUser(this User user, ChangeProfileDTO model)
         {
-            user.Email = model.Email;
-            user.FirstName = model.FirstName;
-            user.LastName = model.LastName;
-            user.Username = model.Username;
+            if (model.Email != null)
+                user.Email = model.Email;
+            if (model.FirstName != null)
+                user.FirstName = model.FirstName;
+            if (model.LastName != null)
+                user.LastName = model.LastName;
+            if (model.Username != null)
+                user.Username = model.Username;
 
             return user;
         }

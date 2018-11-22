@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Collector.BL.Models.Debt
 {
@@ -20,6 +21,8 @@ namespace Collector.BL.Models.Debt
 
         public float Value { get; set; }
         public bool IsOwnerDebter { get; set; }
-
+        public byte[] RowVersion { get; set; }
+        public DateTime? DateOfOverdue { get; set; }
+        public bool IsClosed { get; set; }
     }
 }

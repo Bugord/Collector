@@ -9,5 +9,6 @@ namespace Collector.BL.Services.UserService
         Task ResetPasswordTokenAsync(ResetPasswordDTO model);
         Task ChangePasswordAsync(ChangePasswordDTO model);
         Task<UserReturnDTO> ChangeProfileAsync(ChangeProfileDTO model);
+        Task ConfirmEmail(string token);
     }
 }

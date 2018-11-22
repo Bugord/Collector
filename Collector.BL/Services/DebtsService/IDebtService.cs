@@ -10,5 +10,7 @@ namespace Collector.BL.Services.DebtsService
         Task<IList<DebtReturnDTO>> GetAllDebtsAsync();
         Task RemoveDebtAsync(long debtId);
         Task UpdateDebtAsync(DebtUpdateDTO model);
+        Task<DebtReturnDTO> GetDebtByIdAsync(long id);
+        Task<IList<ChangeReturnDTO>> GetDebtChangesByIdAsync(long id);
     }
 }

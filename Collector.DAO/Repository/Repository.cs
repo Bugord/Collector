@@ -24,7 +24,7 @@ namespace Collector.DAO.Repository
             if (entity == null)
                 throw new NullReferenceException();
 
-            _entities.Add(entity);
+            await _entities.AddAsync(entity);
             await _context.SaveChangesAsync();
             return entity;
         }
@@ -38,8 +38,7 @@ namespace Collector.DAO.Repository
             if (entity == null)
                 throw new NullReferenceException();
 
-            _entities.Update(entity);
-
+            await Task.Run(() => _entities.Update(entity));
             await _context.SaveChangesAsync();
         }
 
@@ -48,13 +47,21 @@ namespace Collector.DAO.Repository
             if (entity == null)
                 throw new NullReferenceException();
 
-            _entities.Remove(entity);
+            await Task.Run(() => _entities.Remove(entity));
 
             await _context.SaveChangesAsync();
         }
 
+
+        public async Task<T> GetByIdAsync(long id,
+            params Expression<Func<T, object>>[] includeParams) =>
+            await includeParams.Aggregate(_entities.Where(arg => arg.Id == id),
+                    (current, include) => current.Include(include))
+                .FirstOrDefaultAsync();
+
         public async Task<T> GetByIdAsync(long id) =>
-            await _entities.FirstOrDefaultAsync(e => e.Id == id);
+            await _entities.Where(arg => arg.Id == id).FirstOrDefaultAsync();
+
 
         public async Task RemoveByIdAsync(long id)
         {
@@ -67,10 +74,31 @@ namespace Collector.DAO.Repository
             expression != null ? await _entities.Where(expression).AnyAsync() : await _entities.AnyAsync();
 
 
-        public async Task<IQueryable<T>> GetAllAsync(Expression<Func<T, bool>> expression = null) =>
-            await Task.Run(() => expression != null ? _entities.Where(expression) : _entities);
+        public async Task<IQueryable<T>> GetAllAsync(Expression<Func<T, bool>> expression = null,
+            params Expression<Func<T, object>>[] includeParams)
+        {
+            if (expression is null)
+            {
+                return includeParams.Aggregate(_entities.AsQueryable(),
+                    (current, include) => current.Include(include));
+            }
 
-        public async Task<T> GetFirstAsync(Expression<Func<T, bool>> expression) =>
-            await _entities.Where(expression).FirstOrDefaultAsync();
+            return await Task.Run(() =>
+                includeParams.Aggregate(_entities.Where(expression), (current, include) => current.Include(include)));
+        }
+
+        public async Task<T> GetFirstAsync(Expression<Func<T, bool>> expression = null,
+            params Expression<Func<T, object>>[] includeParams)
+        {
+            if (expression is null)
+            {
+                return await includeParams.Aggregate(_entities.AsQueryable(),
+                    (current, include) => current.Include(include)).FirstOrDefaultAsync();
+            }
+
+            return await
+                includeParams.Aggregate(_entities.Where(expression), (current, include) => current.Include(include))
+                    .FirstOrDefaultAsync();
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Collector.BL.Services.AuthorizationService;
 using Collector.BL.Services.DebtsService;
 using Collector.BL.Services.EmailService;
+using Collector.BL.Services.Feedback;
 using Collector.BL.Services.FriendListService;
 using Collector.BL.Services.UserService;
 using Collector.DAO.Repository;
@@ -26,6 +27,7 @@ namespace Collector.Extentions
             serviceCollection.AddScoped<IDebtService, DebtService>();
             serviceCollection.AddScoped<IEmailService, EmailService>();
             serviceCollection.AddScoped<IUserService, UserService>();
+            serviceCollection.AddScoped<IFeedbackService, FeedbackService>();
         }
     }
 }

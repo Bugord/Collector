@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.SqlTypes;
 using System.Threading.Tasks;
 using Collector.BL.Exceptions;
 using Collector.BL.Services.AuthorizationService;
@@ -6,6 +7,7 @@ using Collector.BL.Models.FriendList;
 using Collector.BL.Services.FriendListService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Collector.Controllers
 {
@@ -29,20 +31,44 @@ namespace Collector.Controllers
                 var data = await _friendService.AddFriendAsync(model);
                 return Ok(data);
             }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
             catch (Exception e)
             {
                 return BadRequest(new {e.Message});
             }
         }
 
-        [HttpPut("updateFriend/{id}")]
+        [HttpPut("updateFriend")]
         [Authorize]
-        public async Task<IActionResult> UpdateFriend(long id, FriendUpdateDTO model)
+        public async Task<IActionResult> UpdateFriend(FriendUpdateDTO model)
         {
             try
             {
                 await _friendService.UpdateFriendAsync(model);
                 return Ok();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest(new
+                {
+                    Message =
+                        "The record you attempted to edit was modified by another user after you got the original value"
+                });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch (NoPermissionException e)
+            {
+                return BadRequest(new {e.Message});
+            }
+            catch (SqlNullValueException e)
+            {
+                return NotFound(new {e.Message});
             }
             catch (Exception e)
             {
@@ -59,12 +85,32 @@ namespace Collector.Controllers
                 await _friendService.RemoveFriendAsync(id);
                 return Ok();
             }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest(new
+                {
+                    Message =
+                        "The record you attempted to edit was modified by another user after you got the original value"
+                });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch (NoPermissionException e)
+            {
+                return BadRequest(new {e.Message});
+            }
+            catch (SqlNullValueException e)
+            {
+                return NotFound(new {e.Message});
+            }
             catch (Exception e)
             {
                 return BadRequest(new {e.Message});
             }
         }
-   
+
 
         [HttpGet("getAllFriends")]
         [Authorize]
@@ -78,9 +124,21 @@ namespace Collector.Controllers
                     invites = await _friendService.GetAllInvitesAsync()
                 });
             }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch (NoPermissionException e)
+            {
+                return BadRequest(new {e.Message});
+            }
+            catch (SqlNullValueException e)
+            {
+                return NotFound(new {e.Message});
+            }
             catch (Exception e)
             {
-                return BadRequest(new { e.Message });
+                return BadRequest(new {e.Message});
             }
         }
 
@@ -95,11 +153,23 @@ namespace Collector.Controllers
             }
             catch (NoPermissionException e)
             {
-                return BadRequest(new { e.Message });
+                return BadRequest(new {e.Message});
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch (SqlNullValueException e)
+            {
+                return NotFound(new {e.Message});
+            }
+            catch (AlreadyExistsException e)
+            {
+                return BadRequest(new {e.Message});
             }
             catch (Exception e)
             {
-                return BadRequest(new { e.Message });
+                return BadRequest(new {e.Message});
             }
         }
 
@@ -112,9 +182,21 @@ namespace Collector.Controllers
                 await _friendService.ApproveInviteAsync(model);
                 return Ok();
             }
-            catch (Exception e)
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch (NoPermissionException e)
             {
                 return BadRequest(new { e.Message });
+            }
+            catch (SqlNullValueException e)
+            {
+                return NotFound(new { e.Message });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new {e.Message});
             }
         }
     }

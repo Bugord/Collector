@@ -15,9 +15,73 @@ namespace Collector.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.1-rtm-30846")
+                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("Collector.DAO.Entities.Change", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long?>("ChangedById");
+
+                    b.Property<long?>("ChangedDebtId");
+
+                    b.Property<DateTime>("Created");
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime?>("Modified");
+
+                    b.Property<long?>("ModifiedBy");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChangedById");
+
+                    b.HasIndex("ChangedDebtId");
+
+                    b.ToTable("Changes");
+                });
+
+            modelBuilder.Entity("Collector.DAO.Entities.ChatMessage", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long?>("AuthorId");
+
+                    b.Property<DateTime>("Created");
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime?>("Modified");
+
+                    b.Property<long?>("ModifiedBy");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
+
+                    b.Property<string>("SentTo");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(500);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.ToTable("ChatMessages");
+                });
 
             modelBuilder.Entity("Collector.DAO.Entities.Debt", b =>
                 {
@@ -29,10 +93,14 @@ namespace Collector.Migrations
 
                     b.Property<long>("CreatedBy");
 
+                    b.Property<DateTime?>("DateOfOverdue");
+
                     b.Property<string>("Description")
                         .HasMaxLength(256);
 
                     b.Property<long>("FriendId");
+
+                    b.Property<bool>("IsClosed");
 
                     b.Property<bool>("IsOwnerDebter");
 
@@ -46,13 +114,166 @@ namespace Collector.Migrations
 
                     b.Property<long>("OwnerId");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
+
                     b.Property<bool>("Synchronize");
 
                     b.Property<float>("Value");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("FriendId");
+
+                    b.HasIndex("OwnerId");
+
                     b.ToTable("Debts");
+                });
+
+            modelBuilder.Entity("Collector.DAO.Entities.EmailConfirmation", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime?>("ConfirmationTime");
+
+                    b.Property<DateTime>("Created");
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime?>("Modified");
+
+                    b.Property<long?>("ModifiedBy");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
+
+                    b.Property<bool>("Used");
+
+                    b.Property<long>("UserId");
+
+                    b.Property<string>("VerificationToken")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("EmailConfirmations");
+                });
+
+            modelBuilder.Entity("Collector.DAO.Entities.Feedback", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime?>("Closed");
+
+                    b.Property<long?>("ClosedById");
+
+                    b.Property<DateTime>("Created");
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<long?>("CreatorId");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500);
+
+                    b.Property<bool>("IsClosed");
+
+                    b.Property<DateTime?>("Modified");
+
+                    b.Property<long?>("ModifiedBy");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(100);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClosedById");
+
+                    b.HasIndex("CreatorId");
+
+                    b.ToTable("Feedbacks");
+                });
+
+            modelBuilder.Entity("Collector.DAO.Entities.FeedbackMessage", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long?>("AuthorId");
+
+                    b.Property<DateTime>("Created");
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<long?>("FeedbackId");
+
+                    b.Property<DateTime?>("Modified");
+
+                    b.Property<long?>("ModifiedBy");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(500);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("FeedbackId");
+
+                    b.ToTable("FeedbackMessages");
+                });
+
+            modelBuilder.Entity("Collector.DAO.Entities.FieldChange", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long?>("ChangeId");
+
+                    b.Property<DateTime>("Created");
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<string>("FieldName");
+
+                    b.Property<DateTime?>("Modified");
+
+                    b.Property<long?>("ModifiedBy");
+
+                    b.Property<string>("NewValue");
+
+                    b.Property<string>("OldValue");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChangeId");
+
+                    b.ToTable("FieldChanges");
                 });
 
             modelBuilder.Entity("Collector.DAO.Entities.Friend", b =>
@@ -65,6 +286,8 @@ namespace Collector.Migrations
 
                     b.Property<long>("CreatedBy");
 
+                    b.Property<long?>("FriendUserId");
+
                     b.Property<long?>("InviteId");
 
                     b.Property<bool>("IsSynchronized");
@@ -73,18 +296,21 @@ namespace Collector.Migrations
 
                     b.Property<long?>("ModifiedBy");
 
-                    b.Property<long>("OwnerId");
-
-                    b.Property<string>("OwnersName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100);
 
-                    b.Property<long?>("UserId");
+                    b.Property<long>("OwnerId");
 
-                    b.Property<string>("UsersName")
-                        .HasMaxLength(100);
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
 
                     b.HasKey("Id");
+
+                    b.HasIndex("FriendUserId");
+
+                    b.HasIndex("OwnerId");
 
                     b.ToTable("Friends");
                 });
@@ -109,6 +335,10 @@ namespace Collector.Migrations
 
                     b.Property<long>("OwnerId");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
+
                     b.Property<long>("UserId");
 
                     b.HasKey("Id");
@@ -116,11 +346,51 @@ namespace Collector.Migrations
                     b.ToTable("Invites");
                 });
 
+            modelBuilder.Entity("Collector.DAO.Entities.PasswordReset", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("Created");
+
+                    b.Property<long>("CreatedBy");
+
+                    b.Property<DateTime>("ExpirationTime");
+
+                    b.Property<DateTime?>("Modified");
+
+                    b.Property<long?>("ModifiedBy");
+
+                    b.Property<DateTime?>("ResetDate");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
+
+                    b.Property<bool>("Used");
+
+                    b.Property<long>("UserId");
+
+                    b.Property<string>("VerificationToken")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PasswordResets");
+                });
+
             modelBuilder.Entity("Collector.DAO.Entities.User", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("AratarUrl");
+
+                    b.Property<bool>("Confirmed");
 
                     b.Property<DateTime>("Created");
 
@@ -147,6 +417,10 @@ namespace Collector.Migrations
 
                     b.Property<int>("Role");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(100);
@@ -154,6 +428,95 @@ namespace Collector.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Collector.DAO.Entities.Change", b =>
+                {
+                    b.HasOne("Collector.DAO.Entities.User", "ChangedBy")
+                        .WithMany()
+                        .HasForeignKey("ChangedById");
+
+                    b.HasOne("Collector.DAO.Entities.Debt", "ChangedDebt")
+                        .WithMany("Changes")
+                        .HasForeignKey("ChangedDebtId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Collector.DAO.Entities.ChatMessage", b =>
+                {
+                    b.HasOne("Collector.DAO.Entities.User", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId");
+                });
+
+            modelBuilder.Entity("Collector.DAO.Entities.Debt", b =>
+                {
+                    b.HasOne("Collector.DAO.Entities.Friend", "Friend")
+                        .WithMany()
+                        .HasForeignKey("FriendId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Collector.DAO.Entities.User", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Collector.DAO.Entities.EmailConfirmation", b =>
+                {
+                    b.HasOne("Collector.DAO.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Collector.DAO.Entities.Feedback", b =>
+                {
+                    b.HasOne("Collector.DAO.Entities.User", "ClosedBy")
+                        .WithMany()
+                        .HasForeignKey("ClosedById");
+
+                    b.HasOne("Collector.DAO.Entities.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatorId");
+                });
+
+            modelBuilder.Entity("Collector.DAO.Entities.FeedbackMessage", b =>
+                {
+                    b.HasOne("Collector.DAO.Entities.User", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId");
+
+                    b.HasOne("Collector.DAO.Entities.Feedback", "Feedback")
+                        .WithMany("Messages")
+                        .HasForeignKey("FeedbackId");
+                });
+
+            modelBuilder.Entity("Collector.DAO.Entities.FieldChange", b =>
+                {
+                    b.HasOne("Collector.DAO.Entities.Change", "Change")
+                        .WithMany("FieldChanges")
+                        .HasForeignKey("ChangeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Collector.DAO.Entities.Friend", b =>
+                {
+                    b.HasOne("Collector.DAO.Entities.User", "FriendUser")
+                        .WithMany()
+                        .HasForeignKey("FriendUserId");
+
+                    b.HasOne("Collector.DAO.Entities.User", "Owner")
+                        .WithMany("Friends")
+                        .HasForeignKey("OwnerId");
+                });
+
+            modelBuilder.Entity("Collector.DAO.Entities.PasswordReset", b =>
+                {
+                    b.HasOne("Collector.DAO.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

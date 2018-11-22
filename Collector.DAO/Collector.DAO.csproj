@@ -5,8 +5,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="1.1.0" />
+    <Compile Remove="Migrations\20181026161848_feedbackClosedByUpdate1Migration.cs" />
+    <Compile Remove="Migrations\20181026162238_feedbackClosedByUpdate1Migration.cs" />
+    <Compile Remove="Migrations\20181026163001_feedbackClosedByUpdate1Migration.cs" />
+    <Compile Remove="Migrations\20181029064651_closedByMigration.cs" />
+    <Compile Remove="Migrations\20181106063731_onDeleteReversedMigration.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.1.4" />
   </ItemGroup>
 
   <ItemGroup>

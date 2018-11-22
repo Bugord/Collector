@@ -18,6 +18,7 @@ namespace Collector.BL.Models.Debt
         [Range(0, Int32.MaxValue, ErrorMessage = "Value must be not negative and less than 2 147 483 647")]
         public float Value { get; set; }
         public bool IsOwnerDebter { get; set; }
+        public DateTime? DateOfOverdue { get; set; }
 
     }
 }

@@ -3,16 +3,14 @@ namespace Collector.DAO.Entities
 {
     public class Friend : BaseEntity
     {
+        public long OwnerId { get; set; }
+        public virtual User Owner { get; set; }
         [Required]
         [StringLength(100, MinimumLength = 3)]
-        public string OwnersName { get; set; }
-        [Required]
-        public long OwnerId { get; set; }
+        public string Name { get; set; }
         [Required]
         public bool IsSynchronized { get; set; }
-        [StringLength(100, MinimumLength = 3)]
-        public string UsersName { get; set; }
-        public long? UserId { get; set; }
+        public virtual User FriendUser { get; set; }
         public long? InviteId { get; set; }
     }
 }

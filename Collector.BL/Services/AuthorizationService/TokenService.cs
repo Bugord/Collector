@@ -4,9 +4,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using Collector.BL.Exceptions;
 using Collector.BL.Extentions;
 using Collector.BL.Models.Authorization;
+using Collector.BL.Services.EmailService;
 using Collector.DAO.Entities;
 using Collector.DAO.Repository;
 using Microsoft.Extensions.Configuration;
@@ -18,12 +20,17 @@ namespace Collector.BL.Services.AuthorizationService
     {
         private readonly IConfiguration _configuration;
         private readonly IRepository<User> _userRepository;
+        private readonly IRepository<EmailConfirmation> _emailConfirmationRepository;
+        private readonly IEmailService _emailService;
 
         public TokenService(IConfiguration configuration,
-            IRepository<User> userRepository)
+            IRepository<User> userRepository, IRepository<EmailConfirmation> emailConfirmationRepository,
+            IEmailService emailService)
         {
             _configuration = configuration;
             _userRepository = userRepository;
+            _emailConfirmationRepository = emailConfirmationRepository;
+            _emailService = emailService;
         }
 
 
@@ -42,6 +49,22 @@ namespace Collector.BL.Services.AuthorizationService
             var newUser = model.RegisterDTOToUser(createdBy);
             newUser = await _userRepository.InsertAsync(newUser);
 
+            if (bool.Parse(_configuration["EmailConfirmation"]))
+            {
+                var encryptedEmail = HttpUtility.UrlEncode((model.Email + "|" + DateTime.UtcNow).CreateMd5());
+                await _emailService.SendEmailAsync(model.Email, "Email confirmation",
+                    $"To confirm email follow this <a href={_configuration["FrontendAdress"]}/confirmEmail/{encryptedEmail}>link</a> ");
+
+                var newEmailConfirmation = new EmailConfirmation
+                {
+                    User = newUser,
+                    CreatedBy = system.Id,
+                    VerificationToken = encryptedEmail
+                };
+                await _emailConfirmationRepository.InsertAsync(newEmailConfirmation);
+                throw new Exception("Check your email and confirm registration");
+            }
+
             return new AuthorizationReturnDTO
             {
                 Token = GenerateJwtToken(model.Username, Role.User.ToString(), newUser.Id),
@@ -56,6 +79,9 @@ namespace Collector.BL.Services.AuthorizationService
                 user.Email == model.Email && user.Password == passwordHash);
             if (foundedUser == null)
                 throw new AuthenticationFailException("Wrong login or(and) password");
+            if (bool.Parse(_configuration["EmailConfirmation"]) && !foundedUser.Confirmed)
+                throw new AuthenticationFailException("you have not confirmed your email");
+
 
             return new AuthorizationReturnDTO
             {
