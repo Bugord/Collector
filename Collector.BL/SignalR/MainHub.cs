@@ -38,17 +38,6 @@ namespace Collector.BL.SignalR
         }
 
         [Authorize]
-        public async Task UpdateDebts(string username)
-        {
-            var user = await _userRepository.GetFirstAsync(user1 => user1.Username == username);
-            if (user == null)
-                throw new ArgumentException();
-
-            var userId = user.Id;
-            await Clients.User(userId.ToString()).SendAsync("UpdateDebts");
-        }
-
-        [Authorize]
         public async Task SendMessage(string message, string sentTo)
         {
             var idClaim = Context.User.FindFirst(ClaimTypes.NameIdentifier);
@@ -93,7 +82,7 @@ namespace Collector.BL.SignalR
             var user = await _userRepository.GetByIdAsync(ownerId);
             if (user == null)
                 throw new ArgumentException();
-
+            
             await Clients.Others.SendAsync("StartTyping", user.Username);
         }
 
