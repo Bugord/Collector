@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 using Collector.BL.Exceptions;
 using Collector.BL.Extentions;
 using Collector.BL.Models.Debt;
+using Collector.BL.SignalR;
 using Collector.DAO.Entities;
 using Collector.DAO.Repository;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Collector.BL.Services.DebtsService
@@ -21,16 +23,18 @@ namespace Collector.BL.Services.DebtsService
         private readonly IRepository<User> _userRepository;
         private readonly IRepository<Change> _changeRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IHubContext<MainHub> _hubContext;
 
         public DebtService(IRepository<Debt> debtRepository, IRepository<Friend> friendRepository,
             IHttpContextAccessor httpContextAccessor, IRepository<User> userRepository,
-            IRepository<Change> changeRepository)
+            IRepository<Change> changeRepository, IHubContext<MainHub> hubContext)
         {
             _debtRepository = debtRepository;
             _friendRepository = friendRepository;
             _httpContextAccessor = httpContextAccessor;
             _userRepository = userRepository;
             _changeRepository = changeRepository;
+            _hubContext = hubContext;
         }
 
 
@@ -42,11 +46,14 @@ namespace Collector.BL.Services.DebtsService
             var ownerId = long.Parse(idClaim.Value);
 
             var owner = await _userRepository.GetByIdAsync(ownerId);
-            var friend = await _friendRepository.GetByIdAsync(model.FriendId);
+            var friend = await _friendRepository.GetByIdAsync(model.FriendId, friend1 => friend1.FriendUser);
 
             var newDebt = model.DebtAddDTOToDebt(friend, owner);
 
-            return (await _debtRepository.InsertAsync(newDebt)).DebtToReturnDebtDTO();
+            var addedDebt = await _debtRepository.InsertAsync(newDebt);
+            if (friend.FriendUser != null && addedDebt.Synchronize)
+                await _hubContext.Clients.User(friend.FriendUser.Id.ToString()).SendAsync("UpdateDebts");
+            return addedDebt.DebtToReturnDebtDTO();
         }
 
         public async Task<DebtReturnDTO> GetDebtByIdAsync(long id)
@@ -99,7 +106,7 @@ namespace Collector.BL.Services.DebtsService
 
             var ownerUser = await (await _userRepository.GetAllAsync(user => user.Id == ownerId, user => user.Friends))
                 .Include("Friends.FriendUser").FirstOrDefaultAsync();
-          
+
 
             var debtsToReturn =
                 await (await _debtRepository.GetAllAsync(debt =>
@@ -137,7 +144,11 @@ namespace Collector.BL.Services.DebtsService
                 await _debtRepository.UpdateAsync(debt);
             }
             else
+            {
                 await _debtRepository.RemoveByIdAsync(debtId);
+                if (debt.Friend.FriendUser != null)
+                    await _hubContext.Clients.User(debt.Friend.FriendUser.Id.ToString()).SendAsync("UpdateDebts");
+            }
         }
 
         public async Task UpdateDebtAsync(DebtUpdateDTO model)
@@ -151,7 +162,7 @@ namespace Collector.BL.Services.DebtsService
             if (oldDebt.Owner.Id != ownerId)
                 throw new NoPermissionException("User is not owner of this debt");
 
-            var friend = await _friendRepository.GetByIdAsync(model.FriendId);
+            var friend = await _friendRepository.GetByIdAsync(model.FriendId, friend1 => friend1.FriendUser);
 
             oldDebt.Update(model, friend, out var listOfFieldChanges);
 
@@ -170,6 +181,7 @@ namespace Collector.BL.Services.DebtsService
 
             oldDebt.ModifiedBy = ownerId;
             await _debtRepository.UpdateAsync(oldDebt);
+            await _hubContext.Clients.User(friend.FriendUser.Id.ToString()).SendAsync("UpdateDebts");
         }
     }
 }

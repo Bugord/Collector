@@ -39,7 +39,8 @@ namespace Collector.BL.Extentions
                 CreatedBy = owner.Id,
                 Synchronize = model.Synchronize,
                 Value = model.Value,
-                IsOwnerDebter = model.IsOwnerDebter
+                IsOwnerDebter = model.IsOwnerDebter,
+                DateOfOverdue = model.DateOfOverdue
             };
         }
 

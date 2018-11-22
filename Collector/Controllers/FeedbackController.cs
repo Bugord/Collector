@@ -60,7 +60,7 @@ namespace Collector.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(new {e.Message});
+                return BadRequest(new { e.Message });
             }
         }
 
@@ -79,7 +79,7 @@ namespace Collector.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(new {e.Message});
+                return BadRequest(new { e.Message });
             }
         }
 
