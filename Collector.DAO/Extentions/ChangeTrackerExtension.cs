@@ -22,8 +22,17 @@ namespace Collector.DAO.Extentions
                         baseAudit.Created = now;
                         break;
                     case EntityState.Modified:
+                        foreach (var entry2 in entry.Properties)
+                        {
+                            if (entry2.Metadata.IsConcurrencyToken)
+                            {
+                                entry2.OriginalValue = entry2.CurrentValue;
+                            }
+                        }
+                       
                         baseAudit.Modified = now;
                         break;
+                    
                 }
             }
         }

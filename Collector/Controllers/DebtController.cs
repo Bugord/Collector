@@ -61,11 +61,11 @@ namespace Collector.Controllers
 
         [HttpGet("debt/{id}/changes")]
         [Authorize]
-        public async Task<IActionResult> GetDebtChangesById(long id)
+        public async Task<IActionResult> GetDebtChangesById([FromQuery]ChangeSearchDTO model)
         {
             try
             {
-                var data = await _debtService.GetDebtChangesByIdAsync(id);
+                var data = await _debtService.GetDebtChangesByIdAsync(model);
                 return Ok(data);
             }
             catch (UnauthorizedAccessException)
@@ -78,13 +78,13 @@ namespace Collector.Controllers
             }
         }
 
-        [HttpGet("getAllDebts")]
+        [HttpPost("getAllDebts")]
         [Authorize]
-        public async Task<IActionResult> GetAllDebts()
+        public async Task<IActionResult> GetAllDebts(DebtSearchObjectDTO model)
         {
             try
             {
-                var data = await _debtService.GetAllDebtsAsync();
+                var data = await _debtService.GetAllDebtsAsync(model);
                 return Ok(data);
             }
             catch (UnauthorizedAccessException)

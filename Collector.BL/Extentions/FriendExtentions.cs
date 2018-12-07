@@ -15,14 +15,5 @@ namespace Collector.BL.Extentions
                 FriendUser = friend.FriendUser?.UserToUserReturnDTO()
             };
         }
-
-        public static Friend ClearUser(this Friend friend)
-        {
-            friend.IsSynchronized = false;
-            friend.FriendUser = null;
-            friend.InviteId = null;
-
-            return friend;
-        }
     }
 }

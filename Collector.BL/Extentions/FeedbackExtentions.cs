@@ -22,11 +22,10 @@ namespace Collector.BL.Extentions
             };
         }
 
-        public static FeedbackReturnDTO ToFeedbackReturnDTO(this Feedback feedback)
+        public static FeedbackReturnDTO ToFeedbackReturnDTO(this Feedback feedback, int messagesCount = -1)
         {
             return new FeedbackReturnDTO
             {
-                Messages = feedback.Messages.Select(message => message.ToFeedbackMessageReturnDTO()).ToList(),
                 Id = feedback.Id,
                 Description = feedback.Description,
                 Subject = feedback.Subject,
@@ -34,7 +33,8 @@ namespace Collector.BL.Extentions
                 Created = feedback.Created,
                 Closed = feedback.Closed,
                 ClosedBy = feedback.ClosedBy?.UserToUserReturnDTO(),
-                Creator = feedback.Creator?.UserToUserReturnDTO()
+                Creator = feedback.Creator?.UserToUserReturnDTO(),
+                MessagesCount = messagesCount != -1 ? messagesCount : feedback.Messages.Count
             };
         }
     }

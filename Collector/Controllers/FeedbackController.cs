@@ -25,6 +25,25 @@ namespace Collector.Controllers
             _feedbackService = feedbackServiceService;
         }
 
+        [HttpGet("getFeedbacks")]
+        [Authorize]
+        public async Task<IActionResult> GetFeedbacks()
+        {
+            try
+            {
+                var data = await _feedbackService.GetFeedbacks(0,0);
+                return Ok(data);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { e.Message });
+            }
+        }
+
         [HttpGet("getFeedback")]
         [Authorize]
         public async Task<IActionResult> GetFeedback(long id)
@@ -70,8 +89,8 @@ namespace Collector.Controllers
         {
             try
             {
-                await _feedbackService.AddFeedbackMessageAsync(model);
-                return Ok();
+                var data = await _feedbackService.AddFeedbackMessageAsync(model);
+                return Ok(data);
             }
             catch (UnauthorizedAccessException)
             {
@@ -83,14 +102,33 @@ namespace Collector.Controllers
             }
         }
 
-        [HttpPut("close")]
+        [HttpGet("getMessages")]
+        [Authorize]
+        public async Task<IActionResult> GetFeedbackMessages(long id)
+        {
+            try
+            {
+                var data = await _feedbackService.GetFeedbackMessages(id);
+                return Ok(data);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { e.Message });
+            }
+        }
+
+        [HttpPut("close/{id}")]
         [AuthorizeRoles(Role.Admin, Role.Moderator)]
         public async Task<IActionResult> CloseFeedback(long id)
         {
             try
             {
-                await _feedbackService.CloseFeedback(id);
-                return Ok();
+                var data = await _feedbackService.CloseFeedback(id);
+                return Ok(data);
             }
             catch (UnauthorizedAccessException)
             {
