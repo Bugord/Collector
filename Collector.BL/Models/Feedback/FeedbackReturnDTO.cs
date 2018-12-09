@@ -15,6 +15,6 @@ namespace Collector.BL.Models.Feedback
         public bool isClosed { get; set; }
         public UserReturnDTO ClosedBy { get; set; }
         public DateTime? Closed { get; set; }
-        public IList<FeedbackMessageReturnDTO>Messages { get; set; }
+        public int MessagesCount { get; set; }
     }
 }

@@ -58,10 +58,9 @@ namespace Collector.BL.Services.UserService
 
         public async Task ChangePasswordAsync(ChangePasswordDTO model)
         {
-            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-            if (idClaim == null)
+            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
-            var ownerId = long.Parse(idClaim.Value);
 
             var user = await _userRepository.GetByIdAsync(ownerId);
             if (model.OldPassword.CreateMd5() != user.Password)
@@ -75,16 +74,16 @@ namespace Collector.BL.Services.UserService
 
         public async Task<UserReturnDTO> ChangeProfileAsync(ChangeProfileDTO model)
         {
-            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-            if (idClaim == null)
+            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
-            var ownerId = long.Parse(idClaim.Value);
+
             var oldUser = await _userRepository.GetByIdAsync(ownerId);
 
             if (model.AvatarFile != null && model.AvatarFile.Length != 0)
             {
                 var path = Path.Combine(
-                    Directory.GetCurrentDirectory(), "wwwroot/images",
+                    Directory.GetCurrentDirectory(), _configuration["ImagesPath"],
                     oldUser.Username + "_" + model.AvatarFile.FileName);
 
                 using (var stream = new FileStream(path, FileMode.Create))

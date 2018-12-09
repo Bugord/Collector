@@ -7,7 +7,6 @@ namespace Collector.BL.Models.Debt
 {
     public class ChangeReturnDTO
     {
-        public UserReturnDTO ChangedBy;
         public IList<FieldChangeReturnDTO> FieldChanges;
         public DateTime ChangeTime;
     }

@@ -15,10 +15,7 @@ namespace Collector.BL.Extentions
             {
                 ChangeTime = change.Created,
                 FieldChanges = change.FieldChanges?.Select(fieldChange => fieldChange.ToChangeReturnDTO()).ToList(),
-                ChangedBy = change.ChangedBy?.UserToUserReturnDTO()
             };
         }
-
-       
     }
 }

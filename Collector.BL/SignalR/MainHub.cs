@@ -38,12 +38,11 @@ namespace Collector.BL.SignalR
         }
 
         [Authorize]
-        public async Task SendMessage(string message, string sentTo)
+        public async Task SendMessage(string text, string sentTo)
         {
-            var idClaim = Context.User.FindFirst(ClaimTypes.NameIdentifier);
-            if (idClaim == null)
+            var idClaim = Context.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
-            var ownerId = long.Parse(idClaim.Value);
 
             var user = await _userRepository.GetByIdAsync(ownerId);
             if (user == null)
@@ -61,38 +60,39 @@ namespace Collector.BL.SignalR
             {
                 CreatedBy = user.Id,
                 Author = user,
-                Text = message,
+                Text = text,
                 SentTo = sentTo
             };
             await _chatMessageRepository.InsertAsync(newChatMessage);
 
             if (string.IsNullOrEmpty(sentTo))
-                await Clients.Others.SendAsync("MessageReceived", user.Username, message, false);
-            else await Clients.User(sentToUser?.Id.ToString()).SendAsync("MessageReceived", user.Username, message, true);
+                await Clients.Others.SendAsync("MessageReceived",
+                    new {user.Username, text, isPrivate = false});
+            else
+                await Clients.User(sentToUser?.Id.ToString()).SendAsync("MessageReceived",
+                    new {user.Username, text, isPrivate = true, sentTo});
         }
 
         [Authorize]
         public async Task StartTyping()
         {
-            var idClaim = Context.User.FindFirst(ClaimTypes.NameIdentifier);
-            if (idClaim == null)
+            var idClaim = Context.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
-            var ownerId = long.Parse(idClaim.Value);
 
             var user = await _userRepository.GetByIdAsync(ownerId);
             if (user == null)
                 throw new ArgumentException();
-            
+
             await Clients.Others.SendAsync("StartTyping", user.Username);
         }
 
         [Authorize]
         public async Task StopTyping()
         {
-            var idClaim = Context.User.FindFirst(ClaimTypes.NameIdentifier);
-            if (idClaim == null)
+            var idClaim = Context.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
-            var ownerId = long.Parse(idClaim.Value);
 
             var user = await _userRepository.GetByIdAsync(ownerId);
             if (user == null)

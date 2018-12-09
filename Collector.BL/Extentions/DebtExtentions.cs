@@ -9,6 +9,15 @@ namespace Collector.BL.Extentions
 {
     public static class DebtExtentions
     {
+
+        public static testDTO DebtToReturnDebtDTO2(this Debt debt)
+        {
+            return new testDTO
+            {
+                Name = debt.Name
+            };
+        }
+
         public static DebtReturnDTO DebtToReturnDebtDTO(this Debt debt, bool isOwner = true, Friend otherFriend = null)
         {
             return new DebtReturnDTO
@@ -80,6 +89,8 @@ namespace Collector.BL.Extentions
             debt.IsClosed = debt.IsClosed.HandleChange(model.IsClosed, nameof(debt.IsClosed), out fieldChange);
             if (fieldChange != null)
                 fieldChanges.Add(fieldChange);
+
+            debt.RowVersion = model.RowVersion;
 
             //debt.RowVersion.HandleChange(model.RowVersion, out fieldChange);
             //if (fieldChange != null)

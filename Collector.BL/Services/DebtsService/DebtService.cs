@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Collector.BL.Exceptions;
@@ -40,10 +41,9 @@ namespace Collector.BL.Services.DebtsService
 
         public async Task<DebtReturnDTO> AddDebtAsync(DebtAddDTO model)
         {
-            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-            if (idClaim == null)
+            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
-            var ownerId = long.Parse(idClaim.Value);
 
             var owner = await _userRepository.GetByIdAsync(ownerId);
             var friend = await _friendRepository.GetByIdAsync(model.FriendId, friend1 => friend1.FriendUser);
@@ -58,10 +58,9 @@ namespace Collector.BL.Services.DebtsService
 
         public async Task<DebtReturnDTO> GetDebtByIdAsync(long id)
         {
-            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-            if (idClaim == null)
+            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
-            var ownerId = long.Parse(idClaim.Value);
 
             var ownerUser = await _userRepository.GetByIdAsync(ownerId, user => user.Friends);
 
@@ -81,39 +80,46 @@ namespace Collector.BL.Services.DebtsService
                 ownerUser.Friends.FirstOrDefault(friend => friend.FriendUser == debtToReturn.Owner));
         }
 
-        public async Task<IList<ChangeReturnDTO>> GetDebtChangesByIdAsync(long id)
+        public async Task<ChangesReturnDTO> GetDebtChangesByIdAsync(ChangeSearchDTO model)
         {
-            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-            if (idClaim == null)
+            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
-            var ownerId = long.Parse(idClaim.Value);
 
-            var changes = (await _changeRepository.GetAllAsync(change => change.ChangedDebt.Id == id))
-                .Include("FieldChanges")
-                .Include("ChangedBy");
+            var changes = (await _changeRepository.GetAllAsync(change =>
+                    change.ChangedDebt.Id == model.Id, change => change.FieldChanges))
+                .OrderByDescending(change => change.Created);
 
+            var changesCount = changes.Count();
 
-            return await changes.Select(change => change.ToChangeReturnDTO()).ToListAsync();
+            var changesTaken = await changes.Skip(model.Offset).Take(model.Take)
+                .Select(change => change.ToChangeReturnDTO()).ToListAsync();
+
+            return new ChangesReturnDTO {Changes = changesTaken, HasMore = model.Offset + model.Take < changesCount};
         }
 
 
-        public async Task<IList<DebtReturnDTO>> GetAllDebtsAsync()
+        public async Task<IList<DebtReturnDTO>> GetAllDebtsAsync(DebtSearchObjectDTO model)
         {
-            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-            if (idClaim == null)
+            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
-            var ownerId = long.Parse(idClaim.Value);
 
             var ownerUser = await (await _userRepository.GetAllAsync(user => user.Id == ownerId, user => user.Friends))
                 .Include("Friends.FriendUser").FirstOrDefaultAsync();
 
+            var userFriends = ownerUser.Friends;
 
             var debtsToReturn =
                 await (await _debtRepository.GetAllAsync(debt =>
-                            debt.Owner.Id == ownerId || (debt.Friend.FriendUser.Id == ownerId && debt.Synchronize),
-                        debt => debt.Friend.FriendUser))
-                    .Select(debt => debt.DebtToReturnDebtDTO(debt.Owner.Id == ownerId,
-                        ownerUser.Friends.FirstOrDefault(friend => friend.FriendUser == debt.Owner)))
+                        debt.Owner.Id == ownerId || debt.Friend.FriendUser.Id == ownerId && debt.Synchronize))
+                    .Include(debt => debt.Friend).Where(model.GetExpression(ownerId))
+                    .Skip(model.Offset)
+                    .Take(model.Take)
+                    .Select(debt => debt.DebtToReturnDebtDTO(
+                        debt.Owner.Id == ownerId,
+                        userFriends.FirstOrDefault(friend => friend.FriendUser.Id == debt.Owner.Id)
+                    ))
                     .ToListAsync();
 
             return debtsToReturn;
@@ -121,10 +127,9 @@ namespace Collector.BL.Services.DebtsService
 
         public async Task RemoveDebtAsync(long debtId)
         {
-            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-            if (idClaim == null)
+            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
-            var ownerId = long.Parse(idClaim.Value);
 
             var debt = await _debtRepository.GetByIdAsync(debtId, debt1 => debt1.Friend.FriendUser,
                 debt1 => debt1.Owner);
@@ -153,10 +158,9 @@ namespace Collector.BL.Services.DebtsService
 
         public async Task UpdateDebtAsync(DebtUpdateDTO model)
         {
-            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-            if (idClaim == null)
+            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
-            var ownerId = long.Parse(idClaim.Value);
 
             var oldDebt = await _debtRepository.GetByIdAsync(model.DebtId, debt => debt.Owner, debt => debt.Friend);
             if (oldDebt.Owner.Id != ownerId)
@@ -181,7 +185,8 @@ namespace Collector.BL.Services.DebtsService
 
             oldDebt.ModifiedBy = ownerId;
             await _debtRepository.UpdateAsync(oldDebt);
-            await _hubContext.Clients.User(friend.FriendUser.Id.ToString()).SendAsync("UpdateDebts");
+            if (friend.FriendUser != null)
+                await _hubContext.Clients.User(friend.FriendUser.Id.ToString()).SendAsync("UpdateDebts");
         }
     }
 }

@@ -34,10 +34,9 @@ namespace Collector.BL.Services.FriendListService
 
         public async Task<FriendReturnDTO> AddFriendAsync(FriendAddDTO model)
         {
-            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-            if (idClaim == null)
+            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
-            var ownerId = long.Parse(idClaim.Value);
 
             var owner = await _userRepository.GetByIdAsync(ownerId);
 
@@ -53,10 +52,9 @@ namespace Collector.BL.Services.FriendListService
 
         public async Task UpdateFriendAsync(FriendUpdateDTO model)
         {
-            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-            if (idClaim == null)
+            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
-            var ownerId = long.Parse(idClaim.Value);
 
             var oldFriend = await _friendRepository.GetByIdAsync(model.Id, friend => friend.Owner);
             if (oldFriend == null)
@@ -72,16 +70,13 @@ namespace Collector.BL.Services.FriendListService
 
         public async Task RemoveFriendAsync(long friendId)
         {
-            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-            if (idClaim == null)
+            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
-            var ownerId = long.Parse(idClaim.Value);
 
             var friend = await _friendRepository.GetByIdAsync(friendId, friend1 => friend1.FriendUser);
             if (friend.IsSynchronized)
             {
-               
-
                 var otherFriend = await _friendRepository.GetFirstAsync(friend1 =>
                     friend1.FriendUser.Id == ownerId && friend1.Owner.Id == friend.FriendUser.Id, friend1 => friend1.FriendUser, friend1 => friend1.Owner);
 
@@ -99,66 +94,13 @@ namespace Collector.BL.Services.FriendListService
                 await _friendRepository.UpdateAsync(otherFriend);
             }
             await _friendRepository.RemoveAsync(friend);
-
-            //    var oldFriends = await _friendRepository.GetByIdAsync(friendId);
-            //    if (oldFriends == null)
-            //        throw new SqlNullValueException("Friend does not exist");
-
-            //    var isOwnerFriend = oldFriends.Owner.Id == ownerId;
-
-            //    if (oldFriends.IsSynchronized && oldFriends.UserId != null)
-            //    {
-            //        var debts = await _debtRepository.GetAllAsync(debt => debt.FriendId == oldFriends.Id);
-
-            //        foreach (var debtToChange in debts)
-            //        {
-            //            if (debtToChange.OwnerId == ownerId)
-            //                debtToChange.IsOwnerDebter = !debtToChange.IsOwnerDebter;
-
-            //            debtToChange.OwnerId = isOwnerFriend ? oldFriends.UserId.Value : oldFriends.OwnerId;
-
-            //            debtToChange.ModifiedBy = ownerId;
-            //        }
-
-            //        await _debtRepository.SaveChangesAsync();
-            //    }
-
-            //    if (isOwnerFriend)
-            //    {
-            //        if (oldFriends.IsSynchronized)
-            //        {
-            //            oldFriends.Desync();
-            //            oldFriends.ModifiedBy = ownerId;
-            //            await _friendRepository.UpdateAsync(oldFriends);
-            //        }
-            //        else
-            //            await _friendRepository.RemoveByIdAsync(friendId);
-
-            //        var invite = await _inviteRepository.GetFirstAsync(invite1 => invite1.FriendId == friendId);
-
-            //        if (invite != null)
-            //            await _inviteRepository.RemoveAsync(invite);
-            //    }
-
-            //    var isUserFriend = oldFriends.UserId == ownerId;
-
-            //    if (isUserFriend)
-            //    {
-            //        oldFriends.ClearUser();
-            //        oldFriends.ModifiedBy = ownerId;
-            //        await _friendRepository.UpdateAsync(oldFriends);
-            //    }
-
-            //    if (!isOwnerFriend && !isUserFriend)
-            //        throw new NoPermissionException("User is not owner of this friend");
         }
 
         public async Task InviteFriendAsync(FriendInviteDTO model)
         {
-            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-            if (idClaim == null)
+            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
-            var ownerId = long.Parse(idClaim.Value);
 
             var isThisUser =
                 await _userRepository.ExistsAsync(user =>
@@ -206,10 +148,9 @@ namespace Collector.BL.Services.FriendListService
 
         public async Task<IList<InviteReturnDTO>> GetAllInvitesAsync()
         {
-            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-            if (idClaim == null)
+            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
-            var ownerId = long.Parse(idClaim.Value);
 
             var inviteList = await _inviteRepository.GetAllAsync(invite => invite.UserId == ownerId);
             var inviteReturnList = new List<InviteReturnDTO>();
@@ -224,41 +165,23 @@ namespace Collector.BL.Services.FriendListService
 
         public async Task<IList<FriendReturnDTO>> GetAllFriendsAsync()
         {
-            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-            if (idClaim == null)
+            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
-            var ownerId = long.Parse(idClaim.Value);
 
             var friendList =
                 (await _friendRepository.GetAllAsync(friend =>
                     friend.Owner.Id == ownerId, friend => friend.FriendUser))
                 .Select(friend => friend.FriendToFriendReturnDTO()).ToList();
 
-            //var friendReturnList = new List<FriendReturnDTO>();
-            //foreach (var friend in friendList)
-            //{
-            //    if (friend.IsSynchronized && friend.FriendUser != null)
-            //    {
-            //        var syncUser = friend.Owner.Id == ownerId
-            //            ? await _userRepository.GetByIdAsync(friend.FriendUser.Id)
-            //            : await _userRepository.GetByIdAsync(friend.Owner.Id);
-            //        if (syncUser == null)
-            //            continue;
-            //        friendReturnList.Add(friend.FriendToFriendReturnDTO());
-            //    }
-            //    else
-            //        friendReturnList.Add(friend.FriendToFriendReturnDTO());
-            //}
-
             return friendList;
         }
 
         public async Task ApproveInviteAsync(FriendAcceptDTO model)
         {
-            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-            if (idClaim == null)
+            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
-            var ownerId = long.Parse(idClaim.Value);
 
             var isOwnerFriend = await _inviteRepository.ExistsAsync(invite =>
                 invite.Id == model.InviteId && invite.UserId == ownerId);
@@ -294,19 +217,6 @@ namespace Collector.BL.Services.FriendListService
 
                     await _friendRepository.UpdateAsync(friendToSync);
                     await _friendRepository.UpdateAsync(oldFriend);
-                    //            var debtsToUpdate = await _debtRepository.GetAllAsync(debt => debt.FriendId == friendToSync.Id);
-
-                    //            foreach (var debt in debtsToUpdate)
-                    //            {
-                    //                debt.FriendId = oldFriend.Id;
-                    //                debt.ModifiedBy = ownerId;
-                    //                //await _debtRepository.UpdateAsync(debt);
-                    //            }
-
-                    //            await _debtRepository.SaveChangesAsync();
-                    //            oldFriend.UsersName = friendToSync.OwnersName;
-
-                    //            await _friendRepository.RemoveAsync(friendToSync);
                 }
                 else
                 {
@@ -328,14 +238,6 @@ namespace Collector.BL.Services.FriendListService
                     await _friendRepository.UpdateAsync(newFriend);
                     await _friendRepository.UpdateAsync(oldFriend);
                 }
-                //        else
-                //            oldFriend.UsersName = model.UsersName;
-
-
-                //        oldFriend.IsSynchronized = true;
-                //        oldFriend.UserId = ownerId;
-                //        oldFriend.ModifiedBy = ownerId;
-                //        await _friendRepository.UpdateAsync(oldFriend);
             }
 
                 await _inviteRepository.RemoveByIdAsync(model.InviteId);
