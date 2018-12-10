@@ -12,8 +12,8 @@ namespace Collector.BL.Extentions
         public static Expression<Func<Debt, bool>> GetExpression(this DebtSearchObjectDTO model, long reqUserId)
         {
             return debt => (!model.IsClosed.HasValue || debt.IsClosed == model.IsClosed) && //Is closed
-                           (!model.FriendId.HasValue || debt.Friend.Id == model.FriendId) && //Friend id
                            (!model.IsSynchronized.HasValue || debt.Synchronize == model.IsSynchronized) && //Is synchronized
+                           (string.IsNullOrEmpty(model.FriendName) || debt.Friend.Name == model.FriendName) && //Friend name
                            (string.IsNullOrEmpty(model.Name) || debt.Name.ToLower().Contains(model.Name.ToLower())) && //Name
                            (string.IsNullOrEmpty(model.Description) || debt.Description.ToLower().Contains(model.Description.ToLower())) && //Description
                            (!model.Overdued.HasValue || (model.Overdued.Value //Overdued

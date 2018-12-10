@@ -156,7 +156,7 @@ namespace Collector.BL.Services.DebtsService
             }
         }
 
-        public async Task UpdateDebtAsync(DebtUpdateDTO model)
+        public async Task<DebtReturnDTO> UpdateDebtAsync(DebtUpdateDTO model)
         {
             var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             if (!long.TryParse(idClaim, out var ownerId))
@@ -184,9 +184,11 @@ namespace Collector.BL.Services.DebtsService
             }
 
             oldDebt.ModifiedBy = ownerId;
-            await _debtRepository.UpdateAsync(oldDebt);
+            var updatedDebt = await _debtRepository.UpdateAsync(oldDebt);
             if (friend.FriendUser != null)
                 await _hubContext.Clients.User(friend.FriendUser.Id.ToString()).SendAsync("UpdateDebts");
+
+            return updatedDebt.DebtToReturnDebtDTO();
         }
     }
 }

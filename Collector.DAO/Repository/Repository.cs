@@ -33,13 +33,15 @@ namespace Collector.DAO.Repository
             await _context.SaveChangesAsync();
 
 
-        public async Task UpdateAsync(T entity)
+        public async Task<T> UpdateAsync(T entity)
         {
             if (entity == null)
                 throw new NullReferenceException();
 
             await Task.Run(() => _entities.Update(entity));
             await _context.SaveChangesAsync();
+
+            return entity;
         }
 
         public async Task RemoveAsync(T entity)

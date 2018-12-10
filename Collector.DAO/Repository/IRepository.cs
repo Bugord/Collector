@@ -21,7 +21,7 @@ namespace Collector.DAO.Repository
         Task RemoveByIdAsync(long id);
         Task<T> InsertAsync(T entity);
         Task RemoveAsync(T entity);
-        Task UpdateAsync(T entity);
+        Task<T> UpdateAsync(T entity);
         Task SaveChangesAsync();
         Task<bool> ExistsAsync(Expression<Func<T, bool>> expression = null);
     }

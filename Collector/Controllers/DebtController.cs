@@ -36,7 +36,7 @@ namespace Collector.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(new { e.Message });
+                return BadRequest(new {e.Message});
             }
         }
 
@@ -55,13 +55,13 @@ namespace Collector.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(new { e.Message });
+                return BadRequest(new {e.Message});
             }
         }
 
         [HttpGet("debt/{id}/changes")]
         [Authorize]
-        public async Task<IActionResult> GetDebtChangesById([FromQuery]ChangeSearchDTO model)
+        public async Task<IActionResult> GetDebtChangesById([FromQuery] ChangeSearchDTO model)
         {
             try
             {
@@ -74,7 +74,7 @@ namespace Collector.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(new { e.Message });
+                return BadRequest(new {e.Message});
             }
         }
 
@@ -93,7 +93,7 @@ namespace Collector.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(new { e.Message });
+                return BadRequest(new {e.Message});
             }
         }
 
@@ -128,7 +128,7 @@ namespace Collector.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(new { e.Message });
+                return BadRequest(new {e.Message});
             }
         }
 
@@ -138,12 +138,16 @@ namespace Collector.Controllers
         {
             try
             {
-                await _debtService.UpdateDebtAsync(model);
-                return Ok();
+                var data = await _debtService.UpdateDebtAsync(model);
+                return Ok(new {debt = data});
             }
             catch (DbUpdateConcurrencyException)
             {
-                return BadRequest(new { Message = "The record you attempted to edit was modified by another user after you got the original value" });
+                return BadRequest(new
+                {
+                    Message =
+                        "The record you attempted to edit was modified by another user after you got the original value"
+                });
             }
             catch (UnauthorizedAccessException)
             {
@@ -151,11 +155,11 @@ namespace Collector.Controllers
             }
             catch (NoPermissionException e)
             {
-                return BadRequest(new { e.Message });
+                return BadRequest(new {e.Message});
             }
             catch (Exception e)
             {
-                return BadRequest(new { e.Message });
+                return BadRequest(new {e.Message});
             }
         }
     }
