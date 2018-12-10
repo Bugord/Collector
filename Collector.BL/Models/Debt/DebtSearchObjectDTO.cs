@@ -12,7 +12,7 @@ namespace Collector.BL.Models.Debt
         public bool? IsSynchronized { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public long? FriendId { get; set; }
+        public string FriendName { get; set; }
         public DateTime? CreatedFrom { get; set; }
         public DateTime? CreatedBefore { get; set; }
         public float? ValueMoreThan { get; set; }

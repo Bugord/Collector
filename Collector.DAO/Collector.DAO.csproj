@@ -10,6 +10,7 @@
     <Compile Remove="Migrations\20181026163001_feedbackClosedByUpdate1Migration.cs" />
     <Compile Remove="Migrations\20181029064651_closedByMigration.cs" />
     <Compile Remove="Migrations\20181106063731_onDeleteReversedMigration.cs" />
+    <Compile Remove="Migrations\20181210101621_testMinValueMigration.cs" />
   </ItemGroup>
 
   <ItemGroup>
