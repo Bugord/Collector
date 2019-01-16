@@ -78,7 +78,8 @@ namespace Collector.BL.Services.FriendListService
             if (friend.IsSynchronized)
             {
                 var otherFriend = await _friendRepository.GetFirstAsync(friend1 =>
-                    friend1.FriendUser.Id == ownerId && friend1.Owner.Id == friend.FriendUser.Id, friend1 => friend1.FriendUser, friend1 => friend1.Owner);
+                        friend1.FriendUser.Id == ownerId && friend1.Owner.Id == friend.FriendUser.Id,
+                    friend1 => friend1.FriendUser, friend1 => friend1.Owner);
 
                 var debts = await _debtRepository.GetAllAsync(debt => debt.Friend == friend);
                 foreach (var debt in debts)
@@ -93,6 +94,10 @@ namespace Collector.BL.Services.FriendListService
 
                 await _friendRepository.UpdateAsync(otherFriend);
             }
+
+            if (friend.InviteId != null)
+                await _inviteRepository.RemoveByIdAsync(friend.InviteId.Value);
+
             await _friendRepository.RemoveAsync(friend);
         }
 
@@ -120,7 +125,8 @@ namespace Collector.BL.Services.FriendListService
                 throw new AlreadyExistsException("Invite of this friend already sent");
 
             var friendToInvite = await _userRepository.GetFirstAsync(user =>
-                user.Email == model.FriendEmail || user.Username == model.FriendEmail);
+                user.Email.Equals(model.FriendEmail, StringComparison.CurrentCultureIgnoreCase) ||
+                user.Username.Equals(model.FriendEmail, StringComparison.CurrentCultureIgnoreCase));
             if (friendToInvite == null)
                 throw new SqlNullValueException("User with this email does not exist");
 
@@ -240,7 +246,7 @@ namespace Collector.BL.Services.FriendListService
                 }
             }
 
-                await _inviteRepository.RemoveByIdAsync(model.InviteId);
+            await _inviteRepository.RemoveByIdAsync(model.InviteId);
         }
     }
 }
