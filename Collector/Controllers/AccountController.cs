@@ -217,6 +217,23 @@ namespace Collector.Controllers
         //           + Guid.NewGuid().ToString().Substring(0, 4)
         //           + Path.GetExtension(fileName);
         //}
+        [HttpGet("user")]
+        public async Task<IActionResult> GetUserInfo(long? id)
+        {
+            try
+            {
+                var data = await _userService.GetUserInfo(id);
+                return Ok(data);
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                return Unauthorized();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { e.Message });
+            }
+        }
 
         [AllowAnonymous]
         [HttpPost("login")]

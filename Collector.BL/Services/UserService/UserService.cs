@@ -39,6 +39,16 @@ namespace Collector.BL.Services.UserService
             _passwordResetRepository = passwordResetRepository;
         }
 
+        public async Task<UserReturnDTO> GetUserInfo(long? id)
+        {
+            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (!long.TryParse(idClaim, out var ownerId))
+                throw new UnauthorizedAccessException();
+
+            var user = await _userRepository.GetByIdAsync(id ?? ownerId);
+            return user.UserToUserReturnDTO();
+        }
+
         public async Task ConfirmEmail(string token)
         {
             var confirmationToApprove = await (await _emailConfirmationRepository.GetAllAsync(
