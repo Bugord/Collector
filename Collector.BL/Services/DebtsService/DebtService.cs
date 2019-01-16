@@ -46,13 +46,17 @@ namespace Collector.BL.Services.DebtsService
                 throw new UnauthorizedAccessException();
 
             var owner = await _userRepository.GetByIdAsync(ownerId);
+            
             var friend = await _friendRepository.GetByIdAsync(model.FriendId, friend1 => friend1.FriendUser);
+            if(friend == null)
+                throw new ArgumentException("Friend with this id does not exist");
 
             var newDebt = model.DebtAddDTOToDebt(friend, owner);
-
             var addedDebt = await _debtRepository.InsertAsync(newDebt);
+
             if (friend.FriendUser != null && addedDebt.Synchronize)
                 await _hubContext.Clients.User(friend.FriendUser.Id.ToString()).SendAsync("UpdateDebts");
+
             return addedDebt.DebtToReturnDebtDTO();
         }
 
