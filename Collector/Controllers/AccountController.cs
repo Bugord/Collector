@@ -197,26 +197,6 @@ namespace Collector.Controllers
             }
         }
 
-        //[HttpPost("UploadFiles")]
-        //public async Task<IActionResult> UploadFile(IFormFile file)
-        //{
-        //    if (file == null)
-        //        return BadRequest();
-
-        //    if (file.Length <= 0) return BadRequest();
-        //    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images", file.FileName);
-        //    file.CopyTo(new FileStream(path, FileMode.Create));
-        //    return Ok();
-        //}
-
-        //private string GetUniqueFileName(string fileName)
-        //{
-        //    fileName = Path.GetFileName(fileName);
-        //    return Path.GetFileNameWithoutExtension(fileName)
-        //           + "_"
-        //           + Guid.NewGuid().ToString().Substring(0, 4)
-        //           + Path.GetExtension(fileName);
-        //}
         [HttpGet("user")]
         public async Task<IActionResult> GetUserInfo(long? id)
         {
