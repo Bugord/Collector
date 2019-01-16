@@ -4,14 +4,16 @@ using Collector.DAO.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Collector.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20181219070316_sentToLong")]
+    partial class sentToLong
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,7 +72,7 @@ namespace Collector.Migrations
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate();
 
-                    b.Property<long?>("SentToId");
+                    b.Property<long>("SentTo");
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -79,8 +81,6 @@ namespace Collector.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AuthorId");
-
-                    b.HasIndex("SentToId");
 
                     b.ToTable("ChatMessages");
                 });
@@ -449,10 +449,6 @@ namespace Collector.Migrations
                     b.HasOne("Collector.DAO.Entities.User", "Author")
                         .WithMany()
                         .HasForeignKey("AuthorId");
-
-                    b.HasOne("Collector.DAO.Entities.User", "SentTo")
-                        .WithMany()
-                        .HasForeignKey("SentToId");
                 });
 
             modelBuilder.Entity("Collector.DAO.Entities.Debt", b =>
