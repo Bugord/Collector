@@ -5,6 +5,7 @@ namespace Collector.BL.Services.UserService
 {
     public interface IUserService
     {
+        Task<UserReturnDTO> GetUserInfo(long? id);
         Task ResetPasswordAsync(string email);
         Task ResetPasswordTokenAsync(ResetPasswordDTO model);
         Task ChangePasswordAsync(ChangePasswordDTO model);

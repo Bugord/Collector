@@ -61,7 +61,7 @@ namespace Collector.BL.SignalR
                 CreatedBy = user.Id,
                 Author = user,
                 Text = text,
-                SentTo = sentTo
+                SentTo = sentToUser
             };
             await _chatMessageRepository.InsertAsync(newChatMessage);
 

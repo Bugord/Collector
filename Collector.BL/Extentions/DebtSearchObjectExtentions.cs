@@ -13,9 +13,12 @@ namespace Collector.BL.Extentions
         {
             return debt => (!model.IsClosed.HasValue || debt.IsClosed == model.IsClosed) && //Is closed
                            (!model.IsSynchronized.HasValue || debt.Synchronize == model.IsSynchronized) && //Is synchronized
-                           (string.IsNullOrEmpty(model.FriendName) || debt.Friend.Name == model.FriendName) && //Friend name
-                           (string.IsNullOrEmpty(model.Name) || debt.Name.ToLower().Contains(model.Name.ToLower())) && //Name
-                           (string.IsNullOrEmpty(model.Description) || debt.Description.ToLower().Contains(model.Description.ToLower())) && //Description
+                           (string.IsNullOrWhiteSpace(model.FriendName) || debt.Friend.Name.Equals(model.FriendName,
+                                StringComparison.CurrentCultureIgnoreCase)) && //Friend name
+                           (string.IsNullOrWhiteSpace(model.Name) || debt.Name.Contains(model.Name,
+                                StringComparison.CurrentCultureIgnoreCase)) && //Name
+                           (string.IsNullOrWhiteSpace(model.Description) || debt.Description.Contains(model.Description,
+                                StringComparison.CurrentCultureIgnoreCase)) && //Description
                            (!model.Overdued.HasValue || (model.Overdued.Value //Overdued
                                 ? debt.DateOfOverdue < DateTime.UtcNow
                                 : debt.DateOfOverdue > DateTime.UtcNow)) &&

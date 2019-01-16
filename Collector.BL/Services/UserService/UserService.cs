@@ -39,6 +39,16 @@ namespace Collector.BL.Services.UserService
             _passwordResetRepository = passwordResetRepository;
         }
 
+        public async Task<UserReturnDTO> GetUserInfo(long? id)
+        {
+            var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (!long.TryParse(idClaim, out var ownerId))
+                throw new UnauthorizedAccessException();
+
+            var user = await _userRepository.GetByIdAsync(id ?? ownerId);
+            return user.UserToUserReturnDTO();
+        }
+
         public async Task ConfirmEmail(string token)
         {
             var confirmationToApprove = await (await _emailConfirmationRepository.GetAllAsync(
@@ -66,8 +76,10 @@ namespace Collector.BL.Services.UserService
             if (model.OldPassword.CreateMd5() != user.Password)
                 throw new ArgumentException("Wrong old password");
             user.Password = model.NewPassword.CreateMd5();
+
             await _emailService.SendEmailAsync(user.Email, "Password changed",
                 "Your password was changed. If you didn't change your password, please, contact us.");
+
             await _userRepository.UpdateAsync(user);
         }
 
@@ -82,30 +94,26 @@ namespace Collector.BL.Services.UserService
 
             if (model.AvatarFile != null && model.AvatarFile.Length != 0)
             {
+                var fileName = oldUser.Username + "_" + DateTime.UtcNow.ToFileTimeUtc() + Path.GetExtension(model.AvatarFile.FileName);
                 var path = Path.Combine(
-                    Directory.GetCurrentDirectory(), _configuration["ImagesPath"],
-                    oldUser.Username + "_" + model.AvatarFile.FileName);
+                    Directory.GetCurrentDirectory(), _configuration["ImagesPath"], fileName
+                );
 
                 using (var stream = new FileStream(path, FileMode.Create))
                 {
                     await model.AvatarFile.CopyToAsync(stream);
                 }
+
+                oldUser.AratarUrl = "/images/" + fileName;
             }
 
-            var userNameExist =
-                await (await _userRepository.GetAllAsync(user => user.Username == model.Username && user.Id != ownerId))
-                    .AnyAsync();
-            if (userNameExist)
-                throw new AlreadyExistsException("This username already exist");
-
             var emailExist =
-                await (await _userRepository.GetAllAsync(user => user.Email == model.Email && user.Id != ownerId))
+                await (await _userRepository.GetAllAsync(user => user.Email.Equals(model.Email, StringComparison.CurrentCultureIgnoreCase) && user.Id != ownerId))
                     .AnyAsync();
             if (emailExist)
                 throw new AlreadyExistsException("This email already exist");
 
             oldUser.UpdateUser(model);
-            if (model.AvatarFile != null) oldUser.AratarUrl = "/images/" + oldUser.Username + "_" + model.AvatarFile.FileName;
 
             await _userRepository.UpdateAsync(oldUser);
 
@@ -120,8 +128,8 @@ namespace Collector.BL.Services.UserService
                 throw new SqlNullValueException("This email does not exist");
 
             var tokenToEncrypt = email + DateTime.UtcNow;
-            var encryptedText = tokenToEncrypt.CreateMd5();
-            encryptedText = HttpUtility.UrlEncode(encryptedText);
+            var encryptedToken = tokenToEncrypt.CreateMd5();
+            encryptedToken = HttpUtility.UrlEncode(encryptedToken);
 
             var oldReset =
                 await _passwordResetRepository.GetFirstAsync(reset => reset.User.Email == email && !reset.Used);
@@ -140,13 +148,13 @@ namespace Collector.BL.Services.UserService
             {
                 CreatedBy = systemUser.Id,
                 ExpirationTime = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["ResetTokenExpireMinutes"])),
-                VerificationToken = encryptedText,
+                VerificationToken = encryptedToken,
                 User = userToReset
             };
             await _passwordResetRepository.InsertAsync(passwordReset);
 
             await _emailService.SendEmailAsync(email, "Password reset",
-                $"To reset password follow this <a href={_configuration["FrontendAdress"]}/resetPassword/{encryptedText}>link</a> " +
+                $"To reset password follow this <a href={_configuration["FrontendAdress"]}/resetPassword/{encryptedToken}>link</a> " +
                 "<br>" +
                 $" Link will expire in {_configuration["ResetTokenExpireMinutes"]} minutes."
             );

@@ -12,6 +12,6 @@ namespace Collector.DAO.Entities
         [Required]
         [MaxLength(500)]
         public string Text { get; set; }
-        public string SentTo { get; set; }
+        public User SentTo { get; set; }
     }
 }
