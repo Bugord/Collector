@@ -23,16 +23,11 @@ namespace Collector.DAO.Entities
         [Required]
         [StringLength(100, MinimumLength = 3)]
         public string LastName { get; set; }
-        //public EmailConfirmation EmailConfirmation { get; set; }
         [Required]
         public bool Confirmed { get; set; }
 
         public string AratarUrl { get; set; }
         public virtual ICollection<Friend> Friends { get; set; }
-        //[InverseProperty("Creator")]
-        //public ICollection<Feedback> Feedbacks { get; set; }
-        //[InverseProperty("ClosedBy")]
-        //public ICollection<Feedback> ClosedFeedbacks { get; set; }
     }
 
     public enum Role

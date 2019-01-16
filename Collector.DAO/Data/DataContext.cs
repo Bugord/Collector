@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Collector.DAO.Entities;
 using Collector.DAO.Extentions;
@@ -40,9 +38,6 @@ namespace Collector.DAO.Data
                 .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Change>().HasMany(change => change.FieldChanges).WithOne(change => change.Change)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            //modelBuilder.Entity<BaseEntity>()
-            //    .Property(p => p.RowVersion).IsConcurrencyToken();
 
             base.OnModelCreating(modelBuilder);
         }

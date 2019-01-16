@@ -9,15 +9,6 @@ namespace Collector.BL.Extentions
 {
     public static class DebtExtentions
     {
-
-        public static testDTO DebtToReturnDebtDTO2(this Debt debt)
-        {
-            return new testDTO
-            {
-                Name = debt.Name
-            };
-        }
-
         public static DebtReturnDTO DebtToReturnDebtDTO(this Debt debt, bool isOwner = true, Friend otherFriend = null)
         {
             return new DebtReturnDTO

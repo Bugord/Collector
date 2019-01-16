@@ -41,8 +41,6 @@ namespace Collector.BL.Extentions
                 user.FirstName = model.FirstName;
             if (model.LastName != null)
                 user.LastName = model.LastName;
-            if (model.Username != null)
-                user.Username = model.Username;
 
             return user;
         }

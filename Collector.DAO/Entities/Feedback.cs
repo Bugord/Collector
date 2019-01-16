@@ -8,10 +8,6 @@ namespace Collector.DAO.Entities
 {
     public class Feedback : BaseEntity
     {
-    //    [ForeignKey("Creator")]
-    //    public long CreatorId { get; set; }
-    //    [ForeignKey("ClosedBy")]
-    //    public long ClosedById { get; set; }
         public virtual User Creator { get; set; }
         public ICollection<FeedbackMessage> Messages { get; set; }
         public virtual User ClosedBy { get; set; }

@@ -30,7 +30,6 @@ namespace Collector.BL.Extentions
                 FieldName = fieldName
             };
             return newValue;
-
         }
     }
 }
