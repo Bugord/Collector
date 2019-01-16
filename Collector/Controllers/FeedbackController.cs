@@ -134,6 +134,10 @@ namespace Collector.Controllers
             {
                 return Unauthorized();
             }
+            catch (NoPermissionException)
+            {
+                return Forbid();
+            }
             catch (Exception e)
             {
                 return BadRequest(new { e.Message });
