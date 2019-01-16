@@ -67,10 +67,10 @@ namespace Collector.BL.SignalR
 
             if (string.IsNullOrEmpty(sentTo))
                 await Clients.Others.SendAsync("MessageReceived",
-                    new {user.Username, text, isPrivate = false});
+                    new {user.Username, text, isPrivate = false, created = newChatMessage.Created});
             else
                 await Clients.User(sentToUser?.Id.ToString()).SendAsync("MessageReceived",
-                    new {user.Username, text, isPrivate = true, sentTo});
+                    new {user.Username, text, isPrivate = true, sentTo, created = newChatMessage.Created });
         }
 
         [Authorize]

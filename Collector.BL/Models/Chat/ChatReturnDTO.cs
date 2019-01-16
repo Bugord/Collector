@@ -11,5 +11,6 @@ namespace Collector.BL.Models.Chat
         public string SentTo { get; set; }
         public bool IsOwner { get; set; }
         public bool IsPrivate { get; set; }
+        public DateTime Created { get; set; }
     }
 }

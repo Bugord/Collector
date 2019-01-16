@@ -16,7 +16,8 @@ namespace Collector.BL.Extentions
                 Text = chatMessage.Text,
                 SentTo = chatMessage.SentTo?.Username,
                 IsOwner = chatMessage.Author.Id == ownerId,
-                IsPrivate = chatMessage.SentTo != null
+                IsPrivate = chatMessage.SentTo != null,
+                Created = chatMessage.Created
             };
         }
     }
