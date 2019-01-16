@@ -12,5 +12,10 @@ namespace Collector.DAO.Entities
         public bool IsSynchronized { get; set; }
         public virtual User FriendUser { get; set; }
         public long? InviteId { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }
