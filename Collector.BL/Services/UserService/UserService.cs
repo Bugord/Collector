@@ -76,8 +76,10 @@ namespace Collector.BL.Services.UserService
             if (model.OldPassword.CreateMd5() != user.Password)
                 throw new ArgumentException("Wrong old password");
             user.Password = model.NewPassword.CreateMd5();
+
             await _emailService.SendEmailAsync(user.Email, "Password changed",
                 "Your password was changed. If you didn't change your password, please, contact us.");
+
             await _userRepository.UpdateAsync(user);
         }
 
@@ -126,8 +128,8 @@ namespace Collector.BL.Services.UserService
                 throw new SqlNullValueException("This email does not exist");
 
             var tokenToEncrypt = email + DateTime.UtcNow;
-            var encryptedText = tokenToEncrypt.CreateMd5();
-            encryptedText = HttpUtility.UrlEncode(encryptedText);
+            var encryptedToken = tokenToEncrypt.CreateMd5();
+            encryptedToken = HttpUtility.UrlEncode(encryptedToken);
 
             var oldReset =
                 await _passwordResetRepository.GetFirstAsync(reset => reset.User.Email == email && !reset.Used);
@@ -146,13 +148,13 @@ namespace Collector.BL.Services.UserService
             {
                 CreatedBy = systemUser.Id,
                 ExpirationTime = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["ResetTokenExpireMinutes"])),
-                VerificationToken = encryptedText,
+                VerificationToken = encryptedToken,
                 User = userToReset
             };
             await _passwordResetRepository.InsertAsync(passwordReset);
 
             await _emailService.SendEmailAsync(email, "Password reset",
-                $"To reset password follow this <a href={_configuration["FrontendAdress"]}/resetPassword/{encryptedText}>link</a> " +
+                $"To reset password follow this <a href={_configuration["FrontendAdress"]}/resetPassword/{encryptedToken}>link</a> " +
                 "<br>" +
                 $" Link will expire in {_configuration["ResetTokenExpireMinutes"]} minutes."
             );

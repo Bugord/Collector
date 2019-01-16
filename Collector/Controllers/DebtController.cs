@@ -23,7 +23,7 @@ namespace Collector.Controllers
 
         [HttpPost("addDebt")]
         [Authorize]
-        public async Task<IActionResult> AddFriend(DebtAddDTO model)
+        public async Task<IActionResult> AddDebt(DebtAddDTO model)
         {
             try
             {
