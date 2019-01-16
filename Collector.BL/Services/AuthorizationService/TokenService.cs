@@ -50,26 +50,29 @@ namespace Collector.BL.Services.AuthorizationService
             newUser = await _userRepository.InsertAsync(newUser);
 
             if (bool.Parse(_configuration["EmailConfirmation"]))
-            {
-                var encryptedEmail = HttpUtility.UrlEncode((model.Email + "|" + DateTime.UtcNow).CreateMd5());
-                await _emailService.SendEmailAsync(model.Email, "Email confirmation",
-                    $"To confirm email follow this <a href={_configuration["FrontendAdress"]}/confirmEmail/{encryptedEmail}>link</a> ");
-
-                var newEmailConfirmation = new EmailConfirmation
-                {
-                    User = newUser,
-                    CreatedBy = system.Id,
-                    VerificationToken = encryptedEmail
-                };
-                await _emailConfirmationRepository.InsertAsync(newEmailConfirmation);
-                throw new Exception("Check your email and confirm registration");
-            }
+                await SendConfrimationEmail(newUser, system.Id);
 
             return new AuthorizationReturnDTO
             {
                 Token = GenerateJwtToken(model.Username, Role.User.ToString(), newUser.Id),
                 User = newUser.UserToUserReturnDTO()
             };
+        }
+
+        public async Task SendConfrimationEmail(User user, long systemId)
+        {
+            var encryptedEmail = HttpUtility.UrlEncode((user.Email + "|" + DateTime.UtcNow).CreateMd5());
+            await _emailService.SendEmailAsync(user.Email, "Email confirmation",
+                $"To confirm email follow this <a href={_configuration["FrontendAdress"]}/confirmEmail/{encryptedEmail}>link</a> ");
+
+            var newEmailConfirmation = new EmailConfirmation
+            {
+                User = user,
+                CreatedBy = systemId,
+                VerificationToken = encryptedEmail
+            };
+            await _emailConfirmationRepository.InsertAsync(newEmailConfirmation);
+            throw new Exception("Check your email and confirm registration");
         }
 
         public async Task<AuthorizationReturnDTO> LoginAsync(LoginDTO model)
