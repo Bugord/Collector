@@ -92,30 +92,26 @@ namespace Collector.BL.Services.UserService
 
             if (model.AvatarFile != null && model.AvatarFile.Length != 0)
             {
+                var fileName = oldUser.Username + "_" + DateTime.UtcNow.ToFileTimeUtc() + Path.GetExtension(model.AvatarFile.FileName);
                 var path = Path.Combine(
-                    Directory.GetCurrentDirectory(), _configuration["ImagesPath"],
-                    oldUser.Username + "_" + model.AvatarFile.FileName);
+                    Directory.GetCurrentDirectory(), _configuration["ImagesPath"], fileName
+                );
 
                 using (var stream = new FileStream(path, FileMode.Create))
                 {
                     await model.AvatarFile.CopyToAsync(stream);
                 }
+
+                oldUser.AratarUrl = "/images/" + fileName;
             }
 
-            var userNameExist =
-                await (await _userRepository.GetAllAsync(user => user.Username == model.Username && user.Id != ownerId))
-                    .AnyAsync();
-            if (userNameExist)
-                throw new AlreadyExistsException("This username already exist");
-
             var emailExist =
-                await (await _userRepository.GetAllAsync(user => user.Email == model.Email && user.Id != ownerId))
+                await (await _userRepository.GetAllAsync(user => user.Email.Equals(model.Email, StringComparison.CurrentCultureIgnoreCase) && user.Id != ownerId))
                     .AnyAsync();
             if (emailExist)
                 throw new AlreadyExistsException("This email already exist");
 
             oldUser.UpdateUser(model);
-            if (model.AvatarFile != null) oldUser.AratarUrl = "/images/" + oldUser.Username + "_" + model.AvatarFile.FileName;
 
             await _userRepository.UpdateAsync(oldUser);
 
