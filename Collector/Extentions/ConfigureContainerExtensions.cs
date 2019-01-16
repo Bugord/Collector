@@ -1,4 +1,5 @@
 ﻿using Collector.BL.Services.AuthorizationService;
+using Collector.BL.Services.ChatService;
 using Collector.BL.Services.DebtsService;
 using Collector.BL.Services.EmailService;
 using Collector.BL.Services.Feedback;
@@ -28,6 +29,7 @@ namespace Collector.Extentions
             serviceCollection.AddScoped<IEmailService, EmailService>();
             serviceCollection.AddScoped<IUserService, UserService>();
             serviceCollection.AddScoped<IFeedbackService, FeedbackService>();
+            serviceCollection.AddScoped<IChatService, ChatService>();
         }
     }
 }
