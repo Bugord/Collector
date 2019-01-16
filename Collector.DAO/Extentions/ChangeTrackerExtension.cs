@@ -11,7 +11,7 @@ namespace Collector.DAO.Extentions
         {
             foreach (var entry in tracker.Entries())
             {
-                if(!(entry.Entity is BaseEntity baseAudit))
+                if (!(entry.Entity is BaseEntity baseAudit))
                     continue;
 
                 var now = DateTime.UtcNow;
@@ -22,19 +22,16 @@ namespace Collector.DAO.Extentions
                         baseAudit.Created = now;
                         break;
                     case EntityState.Modified:
-                        foreach (var entry2 in entry.Properties)
-                        {
-                            if (entry2.Metadata.IsConcurrencyToken)
-                            {
-                                entry2.OriginalValue = entry2.CurrentValue;
-                            }
-                        }
-                       
+                        SetRowVersion(entry);
                         baseAudit.Modified = now;
                         break;
-                    
                 }
             }
+        }
+
+        private static void SetRowVersion(EntityEntry entry)
+        {
+            entry.OriginalValues[nameof(BaseEntity.RowVersion)] = entry.CurrentValues[nameof(BaseEntity.RowVersion)];
         }
     }
 }
