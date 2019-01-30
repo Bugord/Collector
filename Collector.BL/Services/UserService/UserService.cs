@@ -8,6 +8,7 @@ using Collector.BL.Services.EmailService;
 using Collector.BL.Exceptions;
 using Collector.BL.Extentions;
 using Collector.BL.Models.Authorization;
+using Collector.BL.Services.UploadService;
 using Collector.DAO.Entities;
 using Collector.DAO.Repository;
 using Microsoft.AspNetCore.Http;
@@ -23,13 +24,14 @@ namespace Collector.BL.Services.UserService
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IUploadService _uploadService;
         private readonly IRepository<EmailConfirmation> _emailConfirmationRepository;
         private readonly IRepository<PasswordReset> _passwordResetRepository;
 
         public UserService(IRepository<User> userRepository, IConfiguration configuration,
             IEmailService emailService, IHttpContextAccessor httpContextAccessor,
             IRepository<EmailConfirmation> emailConfirmationRepository,
-            IRepository<PasswordReset> passwordResetRepository)
+            IRepository<PasswordReset> passwordResetRepository, IUploadService uploadService)
         {
             _userRepository = userRepository;
             _configuration = configuration;
@@ -37,9 +39,10 @@ namespace Collector.BL.Services.UserService
             _httpContextAccessor = httpContextAccessor;
             _emailConfirmationRepository = emailConfirmationRepository;
             _passwordResetRepository = passwordResetRepository;
+            _uploadService = uploadService;
         }
 
-        public async Task<UserReturnDTO> GetUserInfo(long? id)
+        public async Task<UserReturnDTO> GetUserInfoAsync(long? id)
         {
             var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             if (!long.TryParse(idClaim, out var ownerId))
@@ -49,7 +52,7 @@ namespace Collector.BL.Services.UserService
             return user.UserToUserReturnDTO();
         }
 
-        public async Task ConfirmEmail(string token)
+        public async Task ConfirmEmailAsync(string token)
         {
             var confirmationToApprove = await (await _emailConfirmationRepository.GetAllAsync(
                 confirmation => confirmation.VerificationToken == token && !confirmation.Used,
@@ -94,17 +97,20 @@ namespace Collector.BL.Services.UserService
 
             if (model.AvatarFile != null && model.AvatarFile.Length != 0)
             {
-                var fileName = oldUser.Username + "_" + DateTime.UtcNow.ToFileTimeUtc() + Path.GetExtension(model.AvatarFile.FileName);
-                var path = Path.Combine(
-                    Directory.GetCurrentDirectory(), _configuration["ImagesPath"], fileName
-                );
+                var avatarUrl = await _uploadService.UploadFileAsync(model.AvatarFile, UploadType.Avatar);
+                oldUser.AratarUrl = avatarUrl;
 
-                using (var stream = new FileStream(path, FileMode.Create))
-                {
-                    await model.AvatarFile.CopyToAsync(stream);
-                }
+                //var fileName = oldUser.Username + "_" + DateTime.UtcNow.ToFileTimeUtc() + Path.GetExtension(model.AvatarFile.FileName);
+                //var path = Path.Combine(
+                //    Directory.GetCurrentDirectory(), "wwwroot", _configuration["ImagesPath"],oldUser.Username, fileName
+                //);
+                //Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", _configuration["ImagesPath"], oldUser.Username));
+                //using (var stream = new FileStream(path, FileMode.Create))
+                //{
+                //    await model.AvatarFile.CopyToAsync(stream);
+                //}
 
-                oldUser.AratarUrl = "/images/" + fileName;
+                //oldUser.AratarUrl = Path.Combine("images/" , oldUser.Username, fileName);
             }
 
             var emailExist =

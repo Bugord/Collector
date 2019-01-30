@@ -5,11 +5,11 @@ namespace Collector.BL.Services.UserService
 {
     public interface IUserService
     {
-        Task<UserReturnDTO> GetUserInfo(long? id);
+        Task<UserReturnDTO> GetUserInfoAsync(long? id);
         Task ResetPasswordAsync(string email);
         Task ResetPasswordTokenAsync(ResetPasswordDTO model);
         Task ChangePasswordAsync(ChangePasswordDTO model);
         Task<UserReturnDTO> ChangeProfileAsync(ChangeProfileDTO model);
-        Task ConfirmEmail(string token);
+        Task ConfirmEmailAsync(string token);
     }
 }

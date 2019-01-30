@@ -94,7 +94,7 @@ namespace Collector.Controllers
         {
             try
             {
-                await _userService.ConfirmEmail(token);
+                await _userService.ConfirmEmailAsync(token);
                 return Ok();
             }
             catch (ArgumentException)
@@ -202,7 +202,7 @@ namespace Collector.Controllers
         {
             try
             {
-                var data = await _userService.GetUserInfo(id);
+                var data = await _userService.GetUserInfoAsync(id);
                 return Ok(data);
             }
             catch (UnauthorizedAccessException e)
