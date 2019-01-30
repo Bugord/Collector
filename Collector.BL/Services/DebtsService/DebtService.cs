@@ -118,6 +118,7 @@ namespace Collector.BL.Services.DebtsService
                 await (await _debtRepository.GetAllAsync(debt =>
                         debt.Owner.Id == ownerId || debt.Friend.FriendUser.Id == ownerId && debt.Synchronize))
                     .Include(debt => debt.Friend).Where(model.GetExpression(ownerId))
+                    .OrderByDescending(debt => debt.Created)
                     .Skip(model.Offset)
                     .Take(model.Take)
                     .Select(debt => debt.DebtToReturnDebtDTO(
