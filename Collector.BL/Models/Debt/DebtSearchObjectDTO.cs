@@ -6,6 +6,7 @@ namespace Collector.BL.Models.Debt
 {
     public class DebtSearchObjectDTO
     {
+        public bool? DebtOwner { get; set; }
         public bool? IsClosed { get; set; }
         public bool? Overdued { get; set; }
         public bool? ReqUserOwe { get; set; }
