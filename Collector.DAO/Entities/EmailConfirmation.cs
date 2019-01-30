@@ -15,6 +15,7 @@ namespace Collector.DAO.Entities
         [Required]
         public string VerificationToken { get; set; }
         public DateTime? ConfirmationTime { get; set; }
+        [Required]
         public bool Used { get; set; }
 
     }

@@ -3,7 +3,9 @@ namespace Collector.DAO.Entities
 {
     public class Friend : BaseEntity
     {
+        [Required]
         public long OwnerId { get; set; }
+        [Required]
         public virtual User Owner { get; set; }
         [Required]
         [StringLength(100, MinimumLength = 3)]

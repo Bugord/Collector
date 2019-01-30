@@ -12,6 +12,7 @@ namespace Collector.DAO.Entities
         public User User { get; set; }
         [Required]
         public string VerificationToken { get; set; }
+        [Required]
         public DateTime ExpirationTime { get; set; }
         [Required]
         public bool Used { get; set; }

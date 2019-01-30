@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Data.SqlTypes;
 using System.Threading.Tasks;
 using Collector.Attributes;
@@ -31,7 +32,7 @@ namespace Collector.Controllers
         {
             try
             {
-                var data = await _feedbackService.GetFeedbacks(0,0);
+                var data = await _feedbackService.GetFeedbacksAsync(0,0);
                 return Ok(data);
             }
             catch (UnauthorizedAccessException)
@@ -50,7 +51,7 @@ namespace Collector.Controllers
         {
             try
             {
-                var data = await _feedbackService.GetFeedback(id);
+                var data = await _feedbackService.GetFeedbackAsync(id);
                 return Ok(data);
             }
             catch (UnauthorizedAccessException)
@@ -108,7 +109,7 @@ namespace Collector.Controllers
         {
             try
             {
-                var data = await _feedbackService.GetFeedbackMessages(id);
+                var data = await _feedbackService.GetFeedbackMessagesAsync(id);
                 return Ok(data);
             }
             catch (UnauthorizedAccessException)
@@ -122,17 +123,24 @@ namespace Collector.Controllers
         }
 
         [HttpPut("close/{id}")]
-        [AuthorizeRoles(Role.Admin, Role.Moderator)]
         public async Task<IActionResult> CloseFeedback(long id)
         {
             try
             {
-                var data = await _feedbackService.CloseFeedback(id);
+                var data = await _feedbackService.CloseFeedbackAsync(id);
                 return Ok(data);
             }
             catch (UnauthorizedAccessException)
             {
                 return Unauthorized();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest(new
+                {
+                    Message =
+                        "The record you attempted to edit was modified by another user after you got the original value"
+                });
             }
             catch (NoPermissionException)
             {

@@ -22,7 +22,9 @@ namespace Collector.DAO.Entities
         public Friend Friend { get; set; }
         [Required]
         public bool Synchronize { get; set; }
+        [Required]
         public bool IsOwnerDebter { get; set; }
+        [Required]
         public bool IsClosed { get; set; }
         public DateTime? DateOfOverdue { get; set; }
         public ICollection<Change> Changes { get; set; }

@@ -30,7 +30,7 @@ namespace Collector.BL.Services.Feedback
             _feedbackMessagesRepository = feedbackMessagesRepository;
         }
 
-        public async Task<IList<FeedbackMessageReturnDTO>> GetFeedbackMessages(long id)
+        public async Task<IList<FeedbackMessageReturnDTO>> GetFeedbackMessagesAsync(long id)
         {
             var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             if (!long.TryParse(idClaim, out var ownerId))
@@ -54,7 +54,7 @@ namespace Collector.BL.Services.Feedback
             return feedbackMessages.Select(message => message.ToFeedbackMessageReturnDTO()).ToList();
         }
 
-        public async Task<IList<FeedbackReturnDTO>> GetFeedbacks(int offset, int count)
+        public async Task<IList<FeedbackReturnDTO>> GetFeedbacksAsync(int offset, int count)
         {
             var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             if (!long.TryParse(idClaim, out var ownerId))
@@ -102,7 +102,7 @@ namespace Collector.BL.Services.Feedback
             return newFeedbackMessage.ToFeedbackMessageReturnDTO();
         }
 
-        public async Task<FeedbackReturnDTO> GetFeedback(long id)
+        public async Task<FeedbackReturnDTO> GetFeedbackAsync(long id)
         {
             var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             if (!long.TryParse(idClaim, out var ownerId))
@@ -127,7 +127,7 @@ namespace Collector.BL.Services.Feedback
             return feedbackToReturn.ToFeedbackReturnDTO();
         }
 
-        public async Task<FeedbackReturnDTO> CloseFeedback(long id)
+        public async Task<FeedbackReturnDTO> CloseFeedbackAsync(long id)
         {
             var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             if (!long.TryParse(idClaim, out var ownerId))

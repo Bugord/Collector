@@ -95,8 +95,12 @@ namespace Collector.BL.Services.FriendListService
                 await _friendRepository.UpdateAsync(otherFriend);
             }
 
-            if (friend.InviteId != null)
-                await _inviteRepository.RemoveByIdAsync(friend.InviteId.Value);
+            if (friend.InviteId.HasValue)
+            {
+                var oldInvite = await _inviteRepository.GetByIdAsync(friend.InviteId.Value);
+                if (oldInvite != null)
+                    await _inviteRepository.RemoveAsync(oldInvite);
+            }
 
             await _friendRepository.RemoveAsync(friend);
         }

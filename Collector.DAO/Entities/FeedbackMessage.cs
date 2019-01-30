@@ -8,7 +8,9 @@ namespace Collector.DAO.Entities
 {
     public class FeedbackMessage : BaseEntity
     {
+        [Required]
         public Feedback Feedback { get; set; }
+        [Required]
         public User Author { get; set; }
         [Required]
         [MaxLength(500)]

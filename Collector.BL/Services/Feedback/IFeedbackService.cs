@@ -10,9 +10,9 @@ namespace Collector.BL.Services.Feedback
     {
         Task<FeedbackReturnDTO> AddFeedbackAsync(FeedbackAddDTO model);
         Task <FeedbackMessageReturnDTO>AddFeedbackMessageAsync(FeedbackMessageAddDTO model);
-        Task<FeedbackReturnDTO> GetFeedback(long id);
-        Task<IList<FeedbackMessageReturnDTO>> GetFeedbackMessages(long id);
-        Task<IList<FeedbackReturnDTO>> GetFeedbacks(int offset, int count);
-        Task<FeedbackReturnDTO> CloseFeedback(long id);
+        Task<FeedbackReturnDTO> GetFeedbackAsync(long id);
+        Task<IList<FeedbackMessageReturnDTO>> GetFeedbackMessagesAsync(long id);
+        Task<IList<FeedbackReturnDTO>> GetFeedbacksAsync(int offset, int count);
+        Task<FeedbackReturnDTO> CloseFeedbackAsync(long id);
     }
 }

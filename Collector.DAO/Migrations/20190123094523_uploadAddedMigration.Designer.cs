@@ -4,14 +4,16 @@ using Collector.DAO.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Collector.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20190123094523_uploadAddedMigration")]
+    partial class uploadAddedMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -27,7 +29,7 @@ namespace Collector.Migrations
 
                     b.Property<long?>("ChangedById");
 
-                    b.Property<long>("ChangedDebtId");
+                    b.Property<long?>("ChangedDebtId");
 
                     b.Property<DateTime>("Created");
 
@@ -56,7 +58,7 @@ namespace Collector.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<long>("AuthorId");
+                    b.Property<long?>("AuthorId");
 
                     b.Property<DateTime>("Created");
 
@@ -218,13 +220,13 @@ namespace Collector.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<long>("AuthorId");
+                    b.Property<long?>("AuthorId");
 
                     b.Property<DateTime>("Created");
 
                     b.Property<long>("CreatedBy");
 
-                    b.Property<long>("FeedbackId");
+                    b.Property<long?>("FeedbackId");
 
                     b.Property<DateTime?>("Modified");
 
@@ -253,14 +255,13 @@ namespace Collector.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<long>("ChangeId");
+                    b.Property<long?>("ChangeId");
 
                     b.Property<DateTime>("Created");
 
                     b.Property<long>("CreatedBy");
 
-                    b.Property<string>("FieldName")
-                        .IsRequired();
+                    b.Property<string>("FieldName");
 
                     b.Property<DateTime?>("Modified");
 
@@ -494,8 +495,7 @@ namespace Collector.Migrations
                 {
                     b.HasOne("Collector.DAO.Entities.User", "Author")
                         .WithMany()
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("AuthorId");
 
                     b.HasOne("Collector.DAO.Entities.User", "SentTo")
                         .WithMany()
@@ -538,13 +538,11 @@ namespace Collector.Migrations
                 {
                     b.HasOne("Collector.DAO.Entities.User", "Author")
                         .WithMany()
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("AuthorId");
 
                     b.HasOne("Collector.DAO.Entities.Feedback", "Feedback")
                         .WithMany("Messages")
-                        .HasForeignKey("FeedbackId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("FeedbackId");
                 });
 
             modelBuilder.Entity("Collector.DAO.Entities.FieldChange", b =>

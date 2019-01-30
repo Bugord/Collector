@@ -4,6 +4,7 @@ using Collector.BL.Services.DebtsService;
 using Collector.BL.Services.EmailService;
 using Collector.BL.Services.Feedback;
 using Collector.BL.Services.FriendListService;
+using Collector.BL.Services.UploadService;
 using Collector.BL.Services.UserService;
 using Collector.DAO.Repository;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,6 +31,7 @@ namespace Collector.Extentions
             serviceCollection.AddScoped<IUserService, UserService>();
             serviceCollection.AddScoped<IFeedbackService, FeedbackService>();
             serviceCollection.AddScoped<IChatService, ChatService>();
+            serviceCollection.AddScoped<IUploadService, UploadService>();
         }
     }
 }

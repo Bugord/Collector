@@ -19,6 +19,7 @@ namespace Collector.DAO.Data
         public DbSet<PasswordReset> PasswordResets { get; set; }
         public DbSet<Change> Changes { get; set; }
         public DbSet<FieldChange> FieldChanges { get; set; }
+        public DbSet<Upload> Uploads { get; set; }
 
         public DataContext(DbContextOptions options) : base(options)
         {
