@@ -8,17 +8,21 @@ namespace Collector.BL.Extentions
 {
     public static class ChatExtentions
     {
-        public static ChatReturnDTO ToChatReturnDTO(this ChatMessage chatMessage, long ownerId)
+        public static ChatMessageReturnDTO ToChatReturnDTO(this ChatMessage chatMessage, long ownerId)
         {
-            return new ChatReturnDTO
+            return new ChatMessageReturnDTO
             {
                 Username = chatMessage.Author.Username,
                 Text = chatMessage.Text,
                 SentTo = chatMessage.SentTo?.Username,
                 IsOwner = chatMessage.Author.Id == ownerId,
                 IsPrivate = chatMessage.SentTo != null,
-                Created = chatMessage.Created
+                Created = chatMessage.Created,
+                AvatarUrl = chatMessage.Author.AratarUrl,
+                Type = chatMessage.Type.ToString(),
+                Id = chatMessage.Id
             };
         }
+
     }
 }

@@ -3,6 +3,8 @@ using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Collector.Attributes;
+using Collector.BL.Models.Chat;
+using Collector.BL.Services.ChatService;
 using Collector.BL.Services.EmailService;
 using Collector.DAO.Entities;
 using Collector.DAO.Repository;
@@ -18,18 +20,21 @@ namespace Collector.BL.SignalR
     {
         private readonly IRepository<User> _userRepository;
         private readonly IRepository<ChatMessage> _chatMessageRepository;
+        private readonly IChatService _chatService;
 
-        public MainHub(IRepository<User> userRepository, IRepository<ChatMessage> chatMessageRepository)
+        public MainHub(IRepository<User> userRepository, IRepository<ChatMessage> chatMessageRepository,
+            IChatService chatService)
         {
             _userRepository = userRepository;
             _chatMessageRepository = chatMessageRepository;
+            _chatService = chatService;
         }
 
         [Authorize]
         public async Task UpdateInvites(string username)
         {
             var userToInvite =
-                await _userRepository.GetFirstAsync(user => user.Username == username || user.Email == username);
+                await _userRepository.GetFirstAsync(user => user.Email == username);
             if (userToInvite == null)
                 throw new ArgumentException();
 
@@ -38,67 +43,38 @@ namespace Collector.BL.SignalR
         }
 
         [Authorize]
-        public async Task SendMessage(string text, string sentTo)
+        public async Task SendMessage(string text, string sentTo, string tempId)
         {
-            var idClaim = Context.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            if (!long.TryParse(idClaim, out var ownerId))
-                throw new UnauthorizedAccessException();
-
-            var user = await _userRepository.GetByIdAsync(ownerId);
-            if (user == null)
-                throw new ArgumentException();
-
-            User sentToUser = null;
-            if (!string.IsNullOrEmpty(sentTo))
+            try
             {
-                sentToUser = await _userRepository.GetFirstAsync(user1 => user1.Username == sentTo);
-                if (sentToUser == null)
-                    throw new ArgumentException("User with this username does not exist");
+                var chatMessage = await
+                    _chatService.SendChatMessageAsync(new ChatMessageAddDTO
+                    {
+                        MessageText = text,
+                        SendToUsername = sentTo
+                    });
+
+                if (string.IsNullOrEmpty(sentTo))
+                    await Clients.Others.SendAsync("MessageReceived",
+                        chatMessage);
+                else
+                {
+                    var sentToUser = await _userRepository.GetFirstAsync(user =>
+                        user.Username.Equals(sentTo, StringComparison.InvariantCultureIgnoreCase));
+
+                    if (sentToUser == null)
+                        throw new ArgumentException("User with such username does not exist");
+
+                    await Clients.User(sentToUser.Id.ToString()).SendAsync("MessageReceived",
+                        chatMessage);
+                }
+
+                await Clients.Caller.SendAsync("MessageApproved", true, tempId, chatMessage);
             }
-
-            var newChatMessage = new ChatMessage
+            catch (Exception e)
             {
-                CreatedBy = user.Id,
-                Author = user,
-                Text = text,
-                SentTo = sentToUser
-            };
-            await _chatMessageRepository.InsertAsync(newChatMessage);
-
-            if (string.IsNullOrEmpty(sentTo))
-                await Clients.Others.SendAsync("MessageReceived",
-                    new {user.Username, text, isPrivate = false, created = newChatMessage.Created});
-            else
-                await Clients.User(sentToUser?.Id.ToString()).SendAsync("MessageReceived",
-                    new {user.Username, text, isPrivate = true, sentTo, created = newChatMessage.Created });
-        }
-
-        [Authorize]
-        public async Task StartTyping()
-        {
-            var idClaim = Context.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            if (!long.TryParse(idClaim, out var ownerId))
-                throw new UnauthorizedAccessException();
-
-            var user = await _userRepository.GetByIdAsync(ownerId);
-            if (user == null)
-                throw new ArgumentException();
-
-            await Clients.Others.SendAsync("StartTyping", user.Username);
-        }
-
-        [Authorize]
-        public async Task StopTyping()
-        {
-            var idClaim = Context.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            if (!long.TryParse(idClaim, out var ownerId))
-                throw new UnauthorizedAccessException();
-
-            var user = await _userRepository.GetByIdAsync(ownerId);
-            if (user == null)
-                throw new ArgumentException();
-
-            await Clients.Others.SendAsync("StopTyping", user.Username);
+                await Clients.Caller.SendAsync("MessageApproved", false, tempId);
+            }
         }
     }
 }
