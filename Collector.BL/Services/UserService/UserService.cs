@@ -99,18 +99,6 @@ namespace Collector.BL.Services.UserService
             {
                 var avatarUrl = await _uploadService.UploadFileAsync(model.AvatarFile, UploadType.Avatar);
                 oldUser.AratarUrl = avatarUrl;
-
-                //var fileName = oldUser.Username + "_" + DateTime.UtcNow.ToFileTimeUtc() + Path.GetExtension(model.AvatarFile.FileName);
-                //var path = Path.Combine(
-                //    Directory.GetCurrentDirectory(), "wwwroot", _configuration["ImagesPath"],oldUser.Username, fileName
-                //);
-                //Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", _configuration["ImagesPath"], oldUser.Username));
-                //using (var stream = new FileStream(path, FileMode.Create))
-                //{
-                //    await model.AvatarFile.CopyToAsync(stream);
-                //}
-
-                //oldUser.AratarUrl = Path.Combine("images/" , oldUser.Username, fileName);
             }
 
             var emailExist =

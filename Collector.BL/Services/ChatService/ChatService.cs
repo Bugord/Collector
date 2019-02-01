@@ -52,8 +52,8 @@ namespace Collector.BL.Services.ChatService
 
 
                 var chatMessages = (await _chatMessageRepository.GetAllAsync(message =>
-                            (message.Author.Id == ownerId && message.SentTo.Id == chatWithUser.Id)
-                            || (message.Author.Id == chatWithUser.Id && message.SentTo.Id == ownerId),
+                            message.Author.Id == ownerId && message.SentTo.Id == chatWithUser.Id
+                            || message.Author.Id == chatWithUser.Id && message.SentTo.Id == ownerId,
                         message => message.Author, message => message.SentTo))
                     .OrderByDescending(message => message.Created)
                     .Skip(model.SkipMessages)
@@ -103,13 +103,6 @@ namespace Collector.BL.Services.ChatService
             var chatMessage = await _chatMessageRepository.InsertAsync(newChatMessage);
 
             return chatMessage.ToChatReturnDTO(ownerId);
-
-            //if (string.IsNullOrWhiteSpace(model.SendToUsername))
-            //    await Clients.Others.SendAsync("MessageReceived",
-            //        new { user.Username, text, isPrivate = false, created = newChatMessage.Created, AvatarUrl = user.AratarUrl });
-            //else
-            //    await Clients.User(sentToUser?.Id.ToString()).SendAsync("MessageReceived",
-            //        new { user.Username, text, isPrivate = true, sentTo, created = newChatMessage.Created, AvatarUrl = user.AratarUrl });
         }
 
         public async Task<string> UploadFileAsync(IFormFile file)
