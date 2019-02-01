@@ -10,6 +10,7 @@ using Collector.BL.Models.FriendList;
 using Collector.DAO.Entities;
 using Collector.DAO.Repository;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace Collector.BL.Services.FriendListService
 {
@@ -79,15 +80,7 @@ namespace Collector.BL.Services.FriendListService
             {
                 var otherFriend = await _friendRepository.GetFirstAsync(friend1 =>
                         friend1.FriendUser.Id == ownerId && friend1.Owner.Id == friend.FriendUser.Id,
-                    friend1 => friend1.FriendUser, friend1 => friend1.Owner);
-
-                var debts = await _debtRepository.GetAllAsync(debt => debt.Friend == friend);
-                foreach (var debt in debts)
-                {
-                    debt.Friend = otherFriend;
-                    debt.Owner = otherFriend.Owner;
-                    debt.IsOwnerDebter = !debt.IsOwnerDebter;
-                }
+                    friend1 => friend1.FriendUser);
 
                 otherFriend.IsSynchronized = false;
                 otherFriend.FriendUser = null;
@@ -110,6 +103,8 @@ namespace Collector.BL.Services.FriendListService
             var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
+
+            var ownerUser = await _userRepository.GetByIdAsync(ownerId);
 
             var isThisUser =
                 await _userRepository.ExistsAsync(user =>
@@ -145,7 +140,7 @@ namespace Collector.BL.Services.FriendListService
                 throw new AlreadyExistsException("You already friends");
 
 
-            var newInvite = model.FriendInviteDTOToInvite(friendToInvite, ownerId);
+            var newInvite = model.FriendInviteDTOToInvite(friendToInvite, ownerId, ownerUser);
 
             var inviteRet = await _inviteRepository.InsertAsync(newInvite);
 
@@ -161,15 +156,12 @@ namespace Collector.BL.Services.FriendListService
             if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
 
-            var inviteList = await _inviteRepository.GetAllAsync(invite => invite.UserId == ownerId);
-            var inviteReturnList = new List<InviteReturnDTO>();
-            foreach (var invite in inviteList)
-            {
-                var ownerUser = await _userRepository.GetByIdAsync(invite.OwnerId);
-                inviteReturnList.Add(invite.InviteToInviteReturnDTO(ownerUser));
-            }
+            var inviteList = await (await _inviteRepository.GetAllAsync(invite => invite.UserId == ownerId,
+                invite => invite.OwnerUser))
+                .Select(invite => invite.InviteToInviteReturnDTO())
+                .ToListAsync();
 
-            return inviteReturnList;
+            return inviteList;
         }
 
         public async Task<IList<FriendReturnDTO>> GetAllFriendsAsync()
@@ -208,7 +200,7 @@ namespace Collector.BL.Services.FriendListService
                     await _friendRepository.GetFirstAsync(friend =>
                         friend.Owner.Id == oldInvite.OwnerId && friend.InviteId == model.InviteId);
                 if (oldFriend == null)
-                    throw new SqlNullValueException("Friend not founded");
+                    throw new SqlNullValueException("Friend not found");
 
                 if (model.FriendId != null)
                 {

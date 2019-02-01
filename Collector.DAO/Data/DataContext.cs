@@ -39,6 +39,8 @@ namespace Collector.DAO.Data
                 .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Change>().HasMany(change => change.FieldChanges).WithOne(change => change.Change)
                 .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Friend>().HasMany(friend => friend.Debts).WithOne(debt => debt.Friend)
+                .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(modelBuilder);
         }

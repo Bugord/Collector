@@ -15,7 +15,7 @@ namespace Collector.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
+                .HasAnnotation("ProductVersion", "2.2.1-servicing-10028")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -348,6 +348,8 @@ namespace Collector.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("Invites");
                 });
 
@@ -505,7 +507,7 @@ namespace Collector.Migrations
             modelBuilder.Entity("Collector.DAO.Entities.Debt", b =>
                 {
                     b.HasOne("Collector.DAO.Entities.Friend", "Friend")
-                        .WithMany()
+                        .WithMany("Debts")
                         .HasForeignKey("FriendId")
                         .OnDelete(DeleteBehavior.Cascade);
 
@@ -564,6 +566,14 @@ namespace Collector.Migrations
                     b.HasOne("Collector.DAO.Entities.User", "Owner")
                         .WithMany("Friends")
                         .HasForeignKey("OwnerId");
+                });
+
+            modelBuilder.Entity("Collector.DAO.Entities.Invite", b =>
+                {
+                    b.HasOne("Collector.DAO.Entities.User", "OwnerUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Collector.DAO.Entities.PasswordReset", b =>
