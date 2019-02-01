@@ -69,9 +69,12 @@ namespace Collector.BL.Services.Feedback
             var isAdminOrModerator = ownerRole == Role.Admin || ownerRole == Role.Moderator;
 
             var feedbacks = await (await _feedbackRepository.GetAllAsync(
-                    feedback => isAdminOrModerator || feedback.Creator.Id == ownerId, feedback => feedback.Creator,
-                    feedback => feedback.ClosedBy))
-                .Select(feedback => feedback.ToFeedbackReturnDTO(feedback.Messages.Count)).ToListAsync();
+                    feedback => isAdminOrModerator || feedback.Creator.Id == ownerId, 
+                    feedback => feedback.Creator,
+                    feedback => feedback.ClosedBy, 
+                    feedback => feedback.Messages))
+                .Select(feedback => feedback.ToFeedbackReturnDTO())
+                .ToListAsync();
 
             return feedbacks;
         }
@@ -118,7 +121,8 @@ namespace Collector.BL.Services.Feedback
             var feedbackToReturn = await _feedbackRepository.GetFirstAsync(
                 feedback => (feedback.Creator.Id == ownerId || isAdminOrModerator) && feedback.Id == id,
                 feedback => feedback.Creator,
-                feedback => feedback.Messages, feedback => feedback.ClosedBy);
+                feedback => feedback.Messages,
+                feedback => feedback.ClosedBy);
 
             if (feedbackToReturn == null)
                 throw new UnauthorizedAccessException();
@@ -144,8 +148,7 @@ namespace Collector.BL.Services.Feedback
 
             var feedbackToClose =
                 await _feedbackRepository.GetFirstAsync(feedback =>
-                        (isAdminOrModerator || feedback.Creator.Id == ownerId) && feedback.Id == id,
-                    feedback => feedback.Creator, feedback => feedback.Messages);
+                        (isAdminOrModerator || feedback.Creator.Id == ownerId) && feedback.Id == id);
 
             var closedBy = await _userRepository.GetByIdAsync(ownerId);
             if (closedBy == null)
