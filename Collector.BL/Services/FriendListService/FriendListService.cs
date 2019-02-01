@@ -129,8 +129,7 @@ namespace Collector.BL.Services.FriendListService
                 throw new AlreadyExistsException("Invite of this friend already sent");
 
             var friendToInvite = await _userRepository.GetFirstAsync(user =>
-                user.Email.Equals(model.FriendEmail, StringComparison.CurrentCultureIgnoreCase) ||
-                user.Username.Equals(model.FriendEmail, StringComparison.CurrentCultureIgnoreCase));
+                user.Email.ToUpper().Equals(model.FriendEmail.ToUpper()));
             if (friendToInvite == null)
                 throw new SqlNullValueException("User with this email does not exist");
 

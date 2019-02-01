@@ -87,7 +87,7 @@ namespace Collector.BL.Services.ChatService
             if (!string.IsNullOrWhiteSpace(model.SendToUsername))
             {
                 sentToUser = await _userRepository.GetFirstAsync(user =>
-                    user.Username.Equals(model.SendToUsername, StringComparison.InvariantCultureIgnoreCase));
+                    user.Username.ToUpper().Equals(model.SendToUsername.ToUpper()));
                 if (sentToUser == null)
                     throw new ArgumentException("User with this username does not exist");
             }
