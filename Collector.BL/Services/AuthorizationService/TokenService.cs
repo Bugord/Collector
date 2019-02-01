@@ -104,7 +104,7 @@ namespace Collector.BL.Services.AuthorizationService
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtKey"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expires = DateTime.Now.AddDays(Convert.ToDouble(_configuration["JwtExpireDays"]));
+            var expires = DateTime.UtcNow.AddDays(Convert.ToDouble(_configuration["JwtExpireDays"]));
             var token = new JwtSecurityToken(
                 _configuration["JwtIssuer"],
                 _configuration["JwtAudience"],
