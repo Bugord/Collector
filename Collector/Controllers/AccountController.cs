@@ -198,6 +198,7 @@ namespace Collector.Controllers
         }
 
         [HttpGet("user")]
+        [Authorize]
         public async Task<IActionResult> GetUserInfo(long? id)
         {
             try
