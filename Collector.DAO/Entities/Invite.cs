@@ -10,6 +10,8 @@ namespace Collector.DAO.Entities
         [Required]
         public long FriendId { get; set; }
         [Required]
+        public User OwnerUser { get; set; }
+        [Required]
         public bool Approved { get; set; }
     }
 }

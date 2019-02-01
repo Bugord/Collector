@@ -99,22 +99,12 @@ namespace Collector.BL.Services.UserService
             {
                 var avatarUrl = await _uploadService.UploadFileAsync(model.AvatarFile, UploadType.Avatar);
                 oldUser.AratarUrl = avatarUrl;
-
-                //var fileName = oldUser.Username + "_" + DateTime.UtcNow.ToFileTimeUtc() + Path.GetExtension(model.AvatarFile.FileName);
-                //var path = Path.Combine(
-                //    Directory.GetCurrentDirectory(), "wwwroot", _configuration["ImagesPath"],oldUser.Username, fileName
-                //);
-                //Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", _configuration["ImagesPath"], oldUser.Username));
-                //using (var stream = new FileStream(path, FileMode.Create))
-                //{
-                //    await model.AvatarFile.CopyToAsync(stream);
-                //}
-
-                //oldUser.AratarUrl = Path.Combine("images/" , oldUser.Username, fileName);
             }
 
             var emailExist =
-                await (await _userRepository.GetAllAsync(user => user.Email.Equals(model.Email, StringComparison.CurrentCultureIgnoreCase) && user.Id != ownerId))
+                await (await _userRepository.GetAllAsync(user =>
+                        user.Email.ToUpper().Equals(model.Email.ToUpper()) &&
+                        user.Id != ownerId))
                     .AnyAsync();
             if (emailExist)
                 throw new AlreadyExistsException("This email already exist");
@@ -129,7 +119,7 @@ namespace Collector.BL.Services.UserService
 
         public async Task ResetPasswordAsync(string email)
         {
-            var userToReset = await _userRepository.GetFirstAsync(user => user.Email == email);
+            var userToReset = await _userRepository.GetFirstAsync(user => user.Email.ToUpper().Equals(email.ToUpper()));
             if (userToReset == null)
                 throw new SqlNullValueException("This email does not exist");
 
@@ -138,7 +128,8 @@ namespace Collector.BL.Services.UserService
             encryptedToken = HttpUtility.UrlEncode(encryptedToken);
 
             var oldReset =
-                await _passwordResetRepository.GetFirstAsync(reset => reset.User.Email == email && !reset.Used);
+                await _passwordResetRepository.GetFirstAsync(reset =>
+                    reset.User.Email.ToUpper().Equals(email.ToUpper()) && !reset.Used);
             if (oldReset != null)
             {
                 oldReset.Used = true;

@@ -109,8 +109,11 @@ namespace Collector.BL.Services.DebtsService
             if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
 
-            var ownerUser = await (await _userRepository.GetAllAsync(user => user.Id == ownerId, user => user.Friends))
-                .Include("Friends.FriendUser").FirstOrDefaultAsync();
+            var ownerUser = await (await _userRepository.GetAllAsync(user => user.Id == ownerId))
+                .Include(user => user.Friends)
+                .ThenInclude(friend => friend.FriendUser)
+                .Select(user => new {user.Friends})
+                .FirstOrDefaultAsync();
 
             var userFriends = ownerUser.Friends;
 

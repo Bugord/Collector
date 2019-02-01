@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 namespace Collector.DAO.Entities
 {
     public class Friend : BaseEntity
@@ -14,6 +15,7 @@ namespace Collector.DAO.Entities
         public bool IsSynchronized { get; set; }
         public virtual User FriendUser { get; set; }
         public long? InviteId { get; set; }
+        public ICollection<Debt> Debts { get; set; }
 
         public override string ToString()
         {

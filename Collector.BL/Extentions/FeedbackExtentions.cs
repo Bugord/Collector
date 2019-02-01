@@ -22,7 +22,7 @@ namespace Collector.BL.Extentions
             };
         }
 
-        public static FeedbackReturnDTO ToFeedbackReturnDTO(this Feedback feedback, int messagesCount = -1)
+        public static FeedbackReturnDTO ToFeedbackReturnDTO(this Feedback feedback)
         {
             return new FeedbackReturnDTO
             {
@@ -34,7 +34,7 @@ namespace Collector.BL.Extentions
                 Closed = feedback.Closed,
                 ClosedBy = feedback.ClosedBy?.UserToUserReturnDTO(),
                 Creator = feedback.Creator?.UserToUserReturnDTO(),
-                MessagesCount = messagesCount != -1 ? messagesCount : feedback.Messages.Count
+                MessagesCount = feedback.Messages.Count
             };
         }
     }
