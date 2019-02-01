@@ -5,19 +5,19 @@ namespace Collector.BL.Extentions
 {
     public static class InviteExtentions
     {
-        public static InviteReturnDTO InviteToInviteReturnDTO(this Invite invite, User owner)
+        public static InviteReturnDTO InviteToInviteReturnDTO(this Invite invite)
         {
             return new InviteReturnDTO
             {
                 Id = invite.Id,
-                Email = owner.Email,
-                Username = owner.Username,
-                LastName = owner.LastName,
-                FirstName = owner.FirstName,
+                Email = invite.OwnerUser.Email,
+                Username = invite.OwnerUser.Username,
+                LastName = invite.OwnerUser.LastName,
+                FirstName = invite.OwnerUser.FirstName,
             };
         }
 
-        public static Invite FriendInviteDTOToInvite(this FriendInviteDTO model, User friendToInvite, long ownerId)
+        public static Invite FriendInviteDTOToInvite(this FriendInviteDTO model, User friendToInvite, long ownerId, User ownerUser)
         {
             return new Invite
             {
@@ -25,7 +25,8 @@ namespace Collector.BL.Extentions
                 FriendId = model.FriendId,
                 CreatedBy = ownerId,
                 UserId = friendToInvite.Id,
-                OwnerId = ownerId
+                OwnerId = ownerId,
+                OwnerUser = ownerUser
             };
         }
     }
