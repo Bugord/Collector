@@ -21,6 +21,101 @@ namespace Collector.Controllers
             _debtService = debtService;
         }
 
+        [HttpGet("getPayments")]
+        [Authorize]
+        public async Task<IActionResult> GetPayments()
+        {
+            try
+            {
+                var data = await _debtService.GetPaymentsAsync();
+                return Ok(data);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { e.Message });
+            }
+        }
+
+        [HttpGet("payNotifications")]
+        [Authorize]
+        public async Task<IActionResult> GetPayNotifications()
+        {
+            try
+            {
+                var data = await _debtService.GetPayNotificationsAsync();
+                return Ok(data);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { e.Message });
+            }
+        }
+
+        [HttpGet("getCurrencies")]
+        [Authorize]
+        public async Task<IActionResult> GetCurrencies()
+        {
+            try
+            {
+                var data = await _debtService.GetCurrenciesAsync();
+                return Ok(data);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { e.Message });
+            }
+        }
+
+        [HttpPut("payNotifications/accept/{id}")]
+        [Authorize]
+        public async Task<IActionResult> AcceptPayNotification(long id)
+        {
+            try
+            {
+                await _debtService.AcceptPayNotificationAsync(id);
+                return Ok();
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { e.Message });
+            }
+        }
+
+        [HttpPut("payNotifications/deny/{id}")]
+        [Authorize]
+        public async Task<IActionResult> DenyPayNotification(long id)
+        {
+            try
+            {
+                var data = await _debtService.DenyPayNotificationAsync(id);
+                return Ok(data);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { e.Message });
+            }
+        }
+
         [HttpPost("addDebt")]
         [Authorize]
         public async Task<IActionResult> AddDebt(DebtAddDTO model)
@@ -56,6 +151,33 @@ namespace Collector.Controllers
             catch (Exception e)
             {
                 return BadRequest(new {e.Message});
+            }
+        }
+
+        [HttpPut("debt/pay")]
+        [Authorize]
+        public async Task<IActionResult> PayDebt(DebtPayDTO model)
+        {
+            try
+            {
+                var data = await _debtService.DebtPayAsync(model);
+                return Ok(data);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest(new
+                {
+                    Message =
+                        "The record you attempted to edit was modified by another user after you got the original value"
+                });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { e.Message });
             }
         }
 

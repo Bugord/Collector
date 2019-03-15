@@ -9,6 +9,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Collector.BL.Exceptions;
 using Collector.BL.Extentions;
 using Collector.BL.Models.Chat;
 using Collector.DAO.Entities;
@@ -110,6 +111,9 @@ namespace Collector.BL.Services.ChatService
             var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
+
+            if (file.Length / 1024 > 2048)
+                throw new FileTooBigException("File must be less than 2mb");
 
             var ownerUser = await _userRepository.GetByIdAsync(ownerId);
 

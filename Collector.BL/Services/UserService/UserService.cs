@@ -93,6 +93,9 @@ namespace Collector.BL.Services.UserService
             if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
 
+            if(model.AvatarFile.Length / 1024 > 2048)
+                throw new FileTooBigException("File must be less than 2mb");
+
             var oldUser = await _userRepository.GetByIdAsync(ownerId);
 
             if (model.AvatarFile != null && model.AvatarFile.Length != 0)
@@ -101,13 +104,16 @@ namespace Collector.BL.Services.UserService
                 oldUser.AratarUrl = avatarUrl;
             }
 
-            var emailExist =
-                await (await _userRepository.GetAllAsync(user =>
-                        user.Email.ToUpper().Equals(model.Email.ToUpper()) &&
-                        user.Id != ownerId))
-                    .AnyAsync();
-            if (emailExist)
-                throw new AlreadyExistsException("This email already exist");
+            if (!string.IsNullOrWhiteSpace(model.Email))
+            {
+                var emailExist =
+                    await (await _userRepository.GetAllAsync(user =>
+                            user.Email.ToUpper().Equals(model.Email.ToUpper()) &&
+                            user.Id != ownerId))
+                        .AnyAsync();
+                if (emailExist)
+                    throw new AlreadyExistsException("This email already exist");
+            }
 
             oldUser.UpdateUser(model);
 

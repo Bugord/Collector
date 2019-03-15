@@ -7,7 +7,6 @@ namespace Collector.BL.Models.Debt
     {
         [Required]
         public long DebtId { get; set; }
-        [Required]
         [StringLength(100, MinimumLength = 3, ErrorMessage = "Debt name must be between 3 an 100")]
         public string Name { get; set; }
         [Required]
@@ -16,13 +15,15 @@ namespace Collector.BL.Models.Debt
         public string Description { get; set; }
         [Required]
         public bool Synchronize { get; set; }
-        [Required]
         [Range(0, int.MaxValue, ErrorMessage = "Value must be not negative and less than 2 147 483 647")]
 
-        public float Value { get; set; }
+        public float? Value { get; set; }
+        public long? CurrencyId { get; set; }
+        public float? CurrentValue { get; set; }
         public bool IsOwnerDebter { get; set; }
         public byte[] RowVersion { get; set; }
         public DateTime? DateOfOverdue { get; set; }
         public bool IsClosed { get; set; }
+        public bool IsMoney { get; set; }
     }
 }

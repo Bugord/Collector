@@ -17,18 +17,21 @@ namespace Collector.BL.Extentions
                 FriendId = isOwner ? debt.Friend.Id : otherFriend.Id,
                 Synchronize = debt.Synchronize,
                 Description = debt.Description,
-                Value = debt.Value,
+                Value = debt.Value ?? 0, //todo change to debt.value
+                CurrentValue = debt.CurrentValue ?? 0,//todo change to debt.CurrentValue
                 Name = debt.Name,
                 IsOwner = isOwner,
-                Created = debt.Created,
+                Created = debt.Created.Date,
                 IsOwnerDebter = debt.IsOwnerDebter,
                 RowVersion = debt.RowVersion,
-                DateOfOverdue = debt.DateOfOverdue,
+                DateOfOverdue = debt.DateOfOverdue?.Date,
                 IsClosed = debt.IsClosed,
+                IsMoney = debt.IsMoney,
+                CurrencyId = debt.Currency?.Id ?? 0,
             };
         }
 
-        public static Debt DebtAddDTOToDebt(this DebtAddDTO model, Friend friend, User owner)
+        public static Debt DebtAddDTOToDebt(this DebtAddDTO model, Friend friend, User owner, Currency currency)
         {
             return new Debt
             {
@@ -40,20 +43,25 @@ namespace Collector.BL.Extentions
                 Synchronize = model.Synchronize,
                 Value = model.Value,
                 IsOwnerDebter = model.IsOwnerDebter,
-                DateOfOverdue = model.DateOfOverdue
+                DateOfOverdue = model.DateOfOverdue,
+                IsMoney = model.IsMoney,
+                CurrentValue = model.CurrentValue,
+                Currency = currency
             };
         }
 
-        public static Debt Update(this Debt debt, DebtUpdateDTO model, Friend friend,
+        public static Debt Update(this Debt debt, DebtUpdateDTO model, Friend friend, Currency currency,
             out List<FieldChange> fieldChanges)
         {
             fieldChanges = new List<FieldChange>();
 
-            debt.Name = debt.Name.HandleChange(model.Name, nameof(debt.Name), out var fieldChange);
-            if (fieldChange != null)
-                fieldChanges.Add(fieldChange);
+            //debt.Name = debt.Name.HandleChange(model.Name, nameof(debt.Name), out var fieldChange);
+            //if (fieldChange != null)
+            //    fieldChanges.Add(fieldChange);
+
+            debt.Name = model.Name;
             
-            debt.Description = debt.Description.HandleChange(model.Description, nameof(debt.Description), out fieldChange);
+            debt.Description = debt.Description.HandleChange(model.Description, nameof(debt.Description), out var fieldChange);
             if (fieldChange != null)
                 fieldChanges.Add(fieldChange);
             
@@ -65,9 +73,13 @@ namespace Collector.BL.Extentions
             if (fieldChange != null)
                 fieldChanges.Add(fieldChange);
 
-            debt.Value = debt.Value.HandleChange(model.Value, nameof(debt.Value), out fieldChange);
-            if (fieldChange != null)
-                fieldChanges.Add(fieldChange);
+            //debt.Value = debt.Value.HandleChange(model.Value, nameof(debt.Value), out fieldChange);
+            //if (fieldChange != null)
+            //    fieldChanges.Add(fieldChange);
+
+            debt.Value = model.Value;
+            debt.CurrentValue = model.CurrentValue;
+            debt.Currency = currency;
 
             debt.IsOwnerDebter = debt.IsOwnerDebter.HandleChange(model.IsOwnerDebter, nameof(debt.IsOwnerDebter), out fieldChange);
             if (fieldChange != null)
@@ -78,6 +90,10 @@ namespace Collector.BL.Extentions
                 fieldChanges.Add(fieldChange);
 
             debt.IsClosed = debt.IsClosed.HandleChange(model.IsClosed, nameof(debt.IsClosed), out fieldChange);
+            if (fieldChange != null)
+                fieldChanges.Add(fieldChange);
+
+            debt.IsMoney = debt.IsClosed.HandleChange(model.IsMoney, nameof(debt.IsMoney), out fieldChange);
             if (fieldChange != null)
                 fieldChanges.Add(fieldChange);
 
