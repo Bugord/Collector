@@ -10,12 +10,12 @@ namespace Collector.DAO.Entities
     {
         [Required]
         public User Owner { get; set; }
-        [Required]
         [StringLength(100, MinimumLength = 1)]
         public string Name { get; set; }
-        [Required]
         [Range(0, int.MaxValue)]
-        public float Value { get; set; }
+        public float? Value { get; set; }
+        [Range(0, int.MaxValue)]
+        public float? CurrentValue { get; set; }
         [StringLength(256)]
         public string Description { get; set; }
         [Required]
@@ -27,6 +27,9 @@ namespace Collector.DAO.Entities
         [Required]
         public bool IsClosed { get; set; }
         public DateTime? DateOfOverdue { get; set; }
+        public bool IsMoney { get; set; }
+        public Currency Currency { get; set; }
         public ICollection<Change> Changes { get; set; }
+        public ICollection<PayNotification> PayNotifications { get; set; }
     }
 }

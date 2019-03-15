@@ -4,14 +4,16 @@ using Collector.DAO.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Collector.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20190219072352_PayNotificationMessageMigration")]
+    partial class PayNotificationMessageMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -87,33 +89,6 @@ namespace Collector.Migrations
                     b.ToTable("ChatMessages");
                 });
 
-            modelBuilder.Entity("Collector.DAO.Entities.Currency", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("Created");
-
-                    b.Property<long>("CreatedBy");
-
-                    b.Property<string>("CurrencyName");
-
-                    b.Property<string>("CurrencySymbol");
-
-                    b.Property<DateTime?>("Modified");
-
-                    b.Property<long?>("ModifiedBy");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate();
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Currencies");
-                });
-
             modelBuilder.Entity("Collector.DAO.Entities.Debt", b =>
                 {
                     b.Property<long>("Id")
@@ -123,8 +98,6 @@ namespace Collector.Migrations
                     b.Property<DateTime>("Created");
 
                     b.Property<long>("CreatedBy");
-
-                    b.Property<long?>("CurrencyId");
 
                     b.Property<float?>("CurrentValue");
 
@@ -159,8 +132,6 @@ namespace Collector.Migrations
                     b.Property<float?>("Value");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CurrencyId");
 
                     b.HasIndex("FriendId");
 
@@ -387,38 +358,6 @@ namespace Collector.Migrations
                     b.ToTable("Invites");
                 });
 
-            modelBuilder.Entity("Collector.DAO.Entities.Notification", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<bool>("Confirmed");
-
-                    b.Property<DateTime>("Created");
-
-                    b.Property<long>("CreatedBy");
-
-                    b.Property<string>("Message")
-                        .HasMaxLength(256);
-
-                    b.Property<DateTime?>("Modified");
-
-                    b.Property<long?>("ModifiedBy");
-
-                    b.Property<long>("RecipientId");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate();
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RecipientId");
-
-                    b.ToTable("Notifications");
-                });
-
             modelBuilder.Entity("Collector.DAO.Entities.PasswordReset", b =>
                 {
                     b.Property<long>("Id")
@@ -461,8 +400,6 @@ namespace Collector.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<bool>("Approved");
-
                     b.Property<bool>("Confirmed");
 
                     b.Property<DateTime>("Created");
@@ -470,6 +407,8 @@ namespace Collector.Migrations
                     b.Property<long>("CreatedBy");
 
                     b.Property<long>("DebtId");
+
+                    b.Property<long?>("DebtOwnerId");
 
                     b.Property<string>("Message");
 
@@ -483,17 +422,15 @@ namespace Collector.Migrations
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate();
 
-                    b.Property<long?>("UserToPayId");
-
                     b.Property<float?>("Value");
 
                     b.HasKey("Id");
 
                     b.HasIndex("DebtId");
 
-                    b.HasIndex("PayerId");
+                    b.HasIndex("DebtOwnerId");
 
-                    b.HasIndex("UserToPayId");
+                    b.HasIndex("PayerId");
 
                     b.ToTable("PayNotifications");
                 });
@@ -615,10 +552,6 @@ namespace Collector.Migrations
 
             modelBuilder.Entity("Collector.DAO.Entities.Debt", b =>
                 {
-                    b.HasOne("Collector.DAO.Entities.Currency", "Currency")
-                        .WithMany()
-                        .HasForeignKey("CurrencyId");
-
                     b.HasOne("Collector.DAO.Entities.Friend", "Friend")
                         .WithMany("Debts")
                         .HasForeignKey("FriendId")
@@ -689,14 +622,6 @@ namespace Collector.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Collector.DAO.Entities.Notification", b =>
-                {
-                    b.HasOne("Collector.DAO.Entities.User", "Recipient")
-                        .WithMany()
-                        .HasForeignKey("RecipientId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
             modelBuilder.Entity("Collector.DAO.Entities.PasswordReset", b =>
                 {
                     b.HasOne("Collector.DAO.Entities.User", "User")
@@ -712,13 +637,13 @@ namespace Collector.Migrations
                         .HasForeignKey("DebtId")
                         .OnDelete(DeleteBehavior.Cascade);
 
+                    b.HasOne("Collector.DAO.Entities.User", "DebtOwner")
+                        .WithMany()
+                        .HasForeignKey("DebtOwnerId");
+
                     b.HasOne("Collector.DAO.Entities.User", "Payer")
                         .WithMany()
                         .HasForeignKey("PayerId");
-
-                    b.HasOne("Collector.DAO.Entities.User", "UserToPay")
-                        .WithMany()
-                        .HasForeignKey("UserToPayId");
                 });
 #pragma warning restore 612, 618
         }

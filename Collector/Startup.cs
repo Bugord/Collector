@@ -77,8 +77,7 @@ namespace Collector
                 {
                     builder.AllowAnyMethod()
                         .AllowAnyHeader()
-                        //.WithOrigins("http://localhost:3000", "http://collector.com:4000")
-                        .AllowAnyOrigin()
+                        .WithOrigins("http://localhost:3000", "https://collector.com")
                         .AllowCredentials();
                 }));
             services.AddSignalR();

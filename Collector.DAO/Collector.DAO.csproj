@@ -11,6 +11,12 @@
     <Compile Remove="Migrations\20181029064651_closedByMigration.cs" />
     <Compile Remove="Migrations\20181106063731_onDeleteReversedMigration.cs" />
     <Compile Remove="Migrations\20181210101621_testMinValueMigration.cs" />
+    <Compile Remove="Migrations\20190218111803_PayNotificationAddMigration.cs" />
+    <Compile Remove="Migrations\20190218112519_PayNotificationAddMigration.cs" />
+    <Compile Remove="Migrations\20190218113625_PayNotificationAddMigration.cs" />
+    <Compile Remove="Migrations\20190218143134_PayNotificationAddMigration.cs" />
+    <Compile Remove="Migrations\20190218145905_PayNotificationAddMigration.cs" />
+    <Compile Remove="Migrations\20190306133115_addedCurrenciesRecordsMigration.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,6 +25,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="BouncyCastle.Crypto">
+      <HintPath>C:\Users\Yury.Kakareka\.nuget\packages\portable.bouncycastle\1.8.2\lib\netstandard2.0\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.EntityFrameworkCore.SqlServer">
       <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.entityframeworkcore.sqlserver\2.1.1\lib\netstandard2.0\Microsoft.EntityFrameworkCore.SqlServer.dll</HintPath>
     </Reference>

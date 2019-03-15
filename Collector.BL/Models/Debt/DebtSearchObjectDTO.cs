@@ -8,6 +8,7 @@ namespace Collector.BL.Models.Debt
     {
         public bool? DebtOwner { get; set; }
         public bool? IsClosed { get; set; }
+        public bool? IsMoney { get; set; }
         public bool? Overdued { get; set; }
         public bool? ReqUserOwe { get; set; }
         public bool? IsSynchronized { get; set; }

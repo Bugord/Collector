@@ -20,6 +20,9 @@ namespace Collector.DAO.Data
         public DbSet<Change> Changes { get; set; }
         public DbSet<FieldChange> FieldChanges { get; set; }
         public DbSet<Upload> Uploads { get; set; }
+        public DbSet<PayNotification> PayNotifications { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<Currency> Currencies { get; set; }
 
         public DataContext(DbContextOptions options) : base(options)
         {
