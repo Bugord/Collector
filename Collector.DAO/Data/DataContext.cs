@@ -1,8 +1,10 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Collector.DAO.Entities;
 using Collector.DAO.Extentions;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace Collector.DAO.Data
 {
@@ -23,8 +25,11 @@ namespace Collector.DAO.Data
         public DbSet<PayNotification> PayNotifications { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Currency> Currencies { get; set; }
+        public DbSet<Payment> Payments { get; set; }
+        public DbSet<CurrencyExchange> СurrencyExchanges { get; set; }
+        public DbSet<CurrencyRate> CurrencyRates { get; set; }
 
-        public DataContext(DbContextOptions options) : base(options)
+        public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
         }
 
@@ -44,6 +49,10 @@ namespace Collector.DAO.Data
                 .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Friend>().HasMany(friend => friend.Debts).WithOne(debt => debt.Friend)
                 .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Payment>().HasOne(payment => payment.Payer).WithMany()
+                .OnDelete(DeleteBehavior.ClientSetNull);
+            modelBuilder.Entity<Payment>().HasOne(payment => payment.UserToPay).WithMany()
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             base.OnModelCreating(modelBuilder);
         }

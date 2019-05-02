@@ -17,6 +17,7 @@ namespace Collector.BL.Extentions
                 DebtDescription = notification.Debt.Description,
                 isMoney = notification.Debt.IsMoney,
                 Value = notification.Value,
+                Currency = notification.Debt.Currency?.CurrencySymbol,
                 Message = notification.Message,
                 DebtName = notification.Debt.Name,
                 RowVersion = notification.RowVersion,
@@ -27,7 +28,7 @@ namespace Collector.BL.Extentions
         {
             return new PaymentDTO
             {
-                Currency = notification.Debt.Currency?.ToCurrencyReturnDTO(),
+                CurrencyId = notification.Debt.Currency?.Id,
                 Value = notification.Value,
                 Date = notification.Created.Date,
                 DebtName = notification.Debt.Name,

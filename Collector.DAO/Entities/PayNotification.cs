@@ -11,8 +11,8 @@ namespace Collector.DAO.Entities
         public User UserToPay { get; set; }
         [Required]
         public Debt Debt { get; set; }
-        [Range(0, Double.MaxValue)]
-        public float? Value { get; set; }
+        [Range(0, (double)decimal.MaxValue)]
+        public decimal? Value { get; set; }
         public string Message { get; set; }
         public bool Confirmed { get; set; } 
         public bool Approved { get; set; } 

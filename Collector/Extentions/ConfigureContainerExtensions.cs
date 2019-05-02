@@ -1,7 +1,9 @@
 ﻿using Collector.BL.Services.AuthorizationService;
+using Collector.BL.Services.ChargeService;
 using Collector.BL.Services.ChatService;
 using Collector.BL.Services.DebtsService;
 using Collector.BL.Services.EmailService;
+using Collector.BL.Services.ExchangeRateService;
 using Collector.BL.Services.Feedback;
 using Collector.BL.Services.FriendListService;
 using Collector.BL.Services.NotificationsService;
@@ -34,6 +36,8 @@ namespace Collector.Extentions
             serviceCollection.AddScoped<IChatService, ChatService>();
             serviceCollection.AddScoped<IUploadService, UploadService>();
             serviceCollection.AddScoped<INotificationService, NotificationService>();
+            serviceCollection.AddScoped<IStripeChargeService, StripeChargeService>();
+            serviceCollection.AddScoped<IExchangeRateService, ExchangeRateService>();
         }
     }
 }

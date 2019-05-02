@@ -17,8 +17,8 @@ namespace Collector.BL.Models.Debt
         public string FriendName { get; set; }
         public DateTime? CreatedFrom { get; set; }
         public DateTime? CreatedBefore { get; set; }
-        public float? ValueMoreThan { get; set; }
-        public float? ValueLessThan { get; set; }
+        public decimal? ValueMoreThan { get; set; }
+        public decimal? ValueLessThan { get; set; }
         public int Offset { get; set; }
         public int Take { get; set; }
     }

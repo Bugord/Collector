@@ -12,6 +12,7 @@ namespace Collector
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>().UseIISIntegration();
+                .UseStartup<Startup>().UseIISIntegration()
+                .UseKestrel(options => { options.Limits.MaxRequestBodySize = 3145728; });
     }
 }

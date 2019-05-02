@@ -142,7 +142,6 @@ namespace Collector.Controllers
             }
         }
 
-
         [HttpPut("changeProfile")]
         [Authorize]
         public async Task<IActionResult> ChangeProfile([FromForm]ChangeProfileDTO model)

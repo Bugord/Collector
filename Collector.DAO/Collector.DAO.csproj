@@ -17,6 +17,10 @@
     <Compile Remove="Migrations\20190218143134_PayNotificationAddMigration.cs" />
     <Compile Remove="Migrations\20190218145905_PayNotificationAddMigration.cs" />
     <Compile Remove="Migrations\20190306133115_addedCurrenciesRecordsMigration.cs" />
+    <Compile Remove="Migrations\20190402110846_paymentsMigration.cs" />
+    <Compile Remove="Migrations\20190402111928_paymentsMigration.cs" />
+    <Compile Remove="Migrations\20190415100301_сurrencyExchangeMigration.cs" />
+    <Compile Remove="Migrations\20190415101309_сurrencyExchangeMigration.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,6 +34,9 @@
     </Reference>
     <Reference Include="Microsoft.EntityFrameworkCore.SqlServer">
       <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.entityframeworkcore.sqlserver\2.1.1\lib\netstandard2.0\Microsoft.EntityFrameworkCore.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\newtonsoft.json\11.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
 

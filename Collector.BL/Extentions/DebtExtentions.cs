@@ -27,6 +27,7 @@ namespace Collector.BL.Extentions
                 DateOfOverdue = debt.DateOfOverdue?.Date,
                 IsClosed = debt.IsClosed,
                 IsMoney = debt.IsMoney,
+                PendingValue = debt.PendingValue ?? 0,
                 CurrencyId = debt.Currency?.Id ?? 0,
             };
         }
@@ -46,7 +47,8 @@ namespace Collector.BL.Extentions
                 DateOfOverdue = model.DateOfOverdue,
                 IsMoney = model.IsMoney,
                 CurrentValue = model.CurrentValue,
-                Currency = currency
+                Currency = currency,
+                PendingValue = model.IsMoney ? 0 : (decimal?)null
             };
         }
 
