@@ -17,9 +17,9 @@ namespace Collector.BL.Models.Debt
         public bool Synchronize { get; set; }
         [Range(0, int.MaxValue, ErrorMessage = "Value must be not negative and less than 2 147 483 647")]
 
-        public float? Value { get; set; }
+        public decimal? Value { get; set; }
         public long? CurrencyId { get; set; }
-        public float? CurrentValue { get; set; }
+        public decimal? CurrentValue { get; set; }
         public bool IsOwnerDebter { get; set; }
         public byte[] RowVersion { get; set; }
         public DateTime? DateOfOverdue { get; set; }

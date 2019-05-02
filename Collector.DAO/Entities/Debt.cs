@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Collector.DAO.Entities
 {
@@ -12,10 +13,14 @@ namespace Collector.DAO.Entities
         public User Owner { get; set; }
         [StringLength(100, MinimumLength = 1)]
         public string Name { get; set; }
+        [Range(0, (double)decimal.MaxValue)]
+        [Column(TypeName = "Money")]
+        public decimal? Value { get; set; }
+        [Range(0, (double)decimal.MaxValue)]
+        [Column(TypeName = "Money")]
+        public decimal? PendingValue { get; set; }
         [Range(0, int.MaxValue)]
-        public float? Value { get; set; }
-        [Range(0, int.MaxValue)]
-        public float? CurrentValue { get; set; }
+        public decimal? CurrentValue { get; set; }
         [StringLength(256)]
         public string Description { get; set; }
         [Required]

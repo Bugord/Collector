@@ -4,14 +4,16 @@ using Collector.DAO.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Collector.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20190415104018_сurrencyExchangeMigration")]
+    partial class сurrencyExchangeMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -182,7 +184,7 @@ namespace Collector.Migrations
 
                     b.Property<long?>("CurrencyId");
 
-                    b.Property<decimal?>("CurrentValue");
+                    b.Property<float?>("CurrentValue");
 
                     b.Property<DateTime?>("DateOfOverdue");
 
@@ -206,8 +208,7 @@ namespace Collector.Migrations
 
                     b.Property<long>("OwnerId");
 
-                    b.Property<decimal?>("PendingValue")
-                        .HasColumnType("Money");
+                    b.Property<float?>("PendingValue");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
@@ -215,8 +216,7 @@ namespace Collector.Migrations
 
                     b.Property<bool>("Synchronize");
 
-                    b.Property<decimal?>("Value")
-                        .HasColumnType("Money");
+                    b.Property<float?>("Value");
 
                     b.HasKey("Id");
 
@@ -545,7 +545,7 @@ namespace Collector.Migrations
 
                     b.Property<long?>("UserToPayId");
 
-                    b.Property<decimal?>("Value");
+                    b.Property<float?>("Value");
 
                     b.HasKey("Id");
 
@@ -594,7 +594,7 @@ namespace Collector.Migrations
 
                     b.Property<long>("UserToPayId");
 
-                    b.Property<decimal?>("Value");
+                    b.Property<float?>("Value");
 
                     b.HasKey("Id");
 

@@ -12,9 +12,10 @@ namespace Collector.BL.Models.Debt
         public long FriendId { get; set; }
         public bool Synchronize { get; set; }
         public string Description { get; set; }
-        public float Value { get; set; } //todo change to float?
+        public decimal Value { get; set; } //todo change to float?
+        public decimal PendingValue { get; set; } //todo change to float?
         public long CurrencyId { get; set; }
-        public float CurrentValue { get; set; } //todo change to float?
+        public decimal CurrentValue { get; set; } //todo change to float?
         public bool IsOwner { get; set; }
         public DateTime Created { get; set; }
         public bool IsOwnerDebter { get; set; }

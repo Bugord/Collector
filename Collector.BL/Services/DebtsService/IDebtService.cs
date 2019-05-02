@@ -12,10 +12,10 @@ namespace Collector.BL.Services.DebtsService
         Task<DebtReturnDTO> UpdateDebtAsync(DebtUpdateDTO model);
         Task<DebtReturnDTO> GetDebtByIdAsync(long id);
         Task<ChangesReturnDTO> GetDebtChangesByIdAsync(ChangeSearchDTO model);
-        Task<DebtReturnDTO> DebtPayAsync(DebtPayDTO model);
+        Task DebtPayAsync(DebtPayDTO model);
         Task<IList<PayNotificationReturnDTO>> GetPayNotificationsAsync();
         Task AcceptPayNotificationAsync(long id);
-        Task<DebtReturnDTO> DenyPayNotificationAsync(long id);
+        Task DenyPayNotificationAsync(long id);
         Task<IList<CurrencyReturnDTO>> GetCurrenciesAsync();
         Task<IList<PaymentDTO>> GetPaymentsAsync();
 

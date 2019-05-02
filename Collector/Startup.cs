@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Stripe;
 
 namespace Collector
 {
@@ -86,10 +87,13 @@ namespace Collector
             services.AddTransientServices();
             services.AddScopedServices();
             services.AddHttpContextAccessor();
+            services.AddHttpClient();
             
             services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
                     b => b.MigrationsAssembly("Collector.DAO")));
+
+            StripeConfiguration.SetApiKey(Configuration.GetSection("Stripe")["SecretKey"]);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

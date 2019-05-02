@@ -11,7 +11,8 @@ namespace Collector.BL.Models.Debt
         public string PayerUsername;
         public string DebtDescription;
         public bool isMoney;
-        public float? Value;
+        public decimal? Value;
+        public string Currency;
         public string DebtName;
         public string Message;
         public byte[] RowVersion;

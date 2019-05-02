@@ -4,14 +4,16 @@ using Collector.DAO.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Collector.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20190403123924_debtPendingValueMigration")]
+    partial class debtPendingValueMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -114,62 +116,6 @@ namespace Collector.Migrations
                     b.ToTable("Currencies");
                 });
 
-            modelBuilder.Entity("Collector.DAO.Entities.CurrencyExchange", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("Created");
-
-                    b.Property<long>("CreatedBy");
-
-                    b.Property<DateTime?>("Modified");
-
-                    b.Property<long?>("ModifiedBy");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate();
-
-                    b.HasKey("Id");
-
-                    b.ToTable("СurrencyExchanges");
-                });
-
-            modelBuilder.Entity("Collector.DAO.Entities.CurrencyRate", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("Created");
-
-                    b.Property<long>("CreatedBy");
-
-                    b.Property<long?>("CurrencyExchangeId");
-
-                    b.Property<long?>("CurrencyId");
-
-                    b.Property<DateTime?>("Modified");
-
-                    b.Property<long?>("ModifiedBy");
-
-                    b.Property<float>("Rate");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate();
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CurrencyExchangeId");
-
-                    b.HasIndex("CurrencyId");
-
-                    b.ToTable("CurrencyRates");
-                });
-
             modelBuilder.Entity("Collector.DAO.Entities.Debt", b =>
                 {
                     b.Property<long>("Id")
@@ -182,7 +128,7 @@ namespace Collector.Migrations
 
                     b.Property<long?>("CurrencyId");
 
-                    b.Property<decimal?>("CurrentValue");
+                    b.Property<float?>("CurrentValue");
 
                     b.Property<DateTime?>("DateOfOverdue");
 
@@ -206,8 +152,7 @@ namespace Collector.Migrations
 
                     b.Property<long>("OwnerId");
 
-                    b.Property<decimal?>("PendingValue")
-                        .HasColumnType("Money");
+                    b.Property<float?>("PendingValue");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
@@ -215,8 +160,7 @@ namespace Collector.Migrations
 
                     b.Property<bool>("Synchronize");
 
-                    b.Property<decimal?>("Value")
-                        .HasColumnType("Money");
+                    b.Property<float?>("Value");
 
                     b.HasKey("Id");
 
@@ -545,7 +489,7 @@ namespace Collector.Migrations
 
                     b.Property<long?>("UserToPayId");
 
-                    b.Property<decimal?>("Value");
+                    b.Property<float?>("Value");
 
                     b.HasKey("Id");
 
@@ -588,13 +532,9 @@ namespace Collector.Migrations
 
                     b.Property<int>("Status");
 
-                    b.Property<DateTime?>("TransactionDate");
-
-                    b.Property<string>("TransactionId");
-
                     b.Property<long>("UserToPayId");
 
-                    b.Property<decimal?>("Value");
+                    b.Property<float?>("Value");
 
                     b.HasKey("Id");
 
@@ -722,17 +662,6 @@ namespace Collector.Migrations
                     b.HasOne("Collector.DAO.Entities.User", "SentTo")
                         .WithMany()
                         .HasForeignKey("SentToId");
-                });
-
-            modelBuilder.Entity("Collector.DAO.Entities.CurrencyRate", b =>
-                {
-                    b.HasOne("Collector.DAO.Entities.CurrencyExchange")
-                        .WithMany("CurrencyRates")
-                        .HasForeignKey("CurrencyExchangeId");
-
-                    b.HasOne("Collector.DAO.Entities.Currency", "Currency")
-                        .WithMany()
-                        .HasForeignKey("CurrencyId");
                 });
 
             modelBuilder.Entity("Collector.DAO.Entities.Debt", b =>

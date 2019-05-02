@@ -103,8 +103,8 @@ namespace Collector.Controllers
         {
             try
             {
-                var data = await _debtService.DenyPayNotificationAsync(id);
-                return Ok(data);
+                await _debtService.DenyPayNotificationAsync(id);
+                return Ok();
             }
             catch (UnauthorizedAccessException)
             {
@@ -160,8 +160,8 @@ namespace Collector.Controllers
         {
             try
             {
-                var data = await _debtService.DebtPayAsync(model);
-                return Ok(data);
+                await _debtService.DebtPayAsync(model);
+                return Ok();
             }
             catch (DbUpdateConcurrencyException)
             {
