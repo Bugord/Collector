@@ -10,6 +10,5 @@ namespace Collector.BL.Services.ChargeService
     public interface IStripeChargeService
     {
         Task<Charge> Charge(ChargeDTO model);
-        Task GetAllCharges();
     }
 }

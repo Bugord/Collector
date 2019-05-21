@@ -12,7 +12,7 @@ namespace Collector.BL.Extentions
                 Id = friend.Id,
                 Name = friend.Name,
                 IsSynchronized = friend.IsSynchronized,
-                FriendUser = friend.FriendUser?.UserToUserReturnDTO()
+                FriendUser = friend.FriendUser?.UserToUserReturnDTO(),
             };
         }
     }
