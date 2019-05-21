@@ -27,7 +27,7 @@ namespace Collector.BL.Services.ChargeService
             var idClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             if (!long.TryParse(idClaim, out var ownerId))
                 throw new UnauthorizedAccessException();
-            
+
             var ownerUser = await _userRepository.GetByIdAsync(ownerId);
 
             var customers = new CustomerService();
@@ -48,16 +48,6 @@ namespace Collector.BL.Services.ChargeService
             });
 
             return newCharge;
-        }
-
-        public async Task GetAllCharges()
-        {
-            var service = new Stripe.ChargeService();
-            var options = new ChargeListOptions
-            {
-                Limit = 3,
-            };
-            var charges = await service.ListAsync(options);
         }
     }
 }

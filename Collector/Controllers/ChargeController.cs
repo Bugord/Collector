@@ -37,25 +37,5 @@ namespace Collector.Controllers
             {
                 return BadRequest(new { e.Message });
             }
-        }
-
-        [HttpGet("charges")]
-        [Authorize]
-        public async Task<IActionResult> Charges(ChargeDTO model)
-        {
-            try
-            {
-                await _chargeService.GetAllCharges();
-                return Ok();
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-            catch (Exception e)
-            {
-                return BadRequest(new { e.Message });
-            }
-        }
-    }
+        }}
 }

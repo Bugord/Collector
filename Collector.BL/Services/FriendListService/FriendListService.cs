@@ -157,7 +157,7 @@ namespace Collector.BL.Services.FriendListService
                 throw new UnauthorizedAccessException();
 
             var inviteList = await (await _inviteRepository.GetAllAsync(invite => invite.UserId == ownerId,
-                invite => invite.OwnerUser))
+                    invite => invite.OwnerUser))
                 .Select(invite => invite.InviteToInviteReturnDTO())
                 .ToListAsync();
 
@@ -173,9 +173,44 @@ namespace Collector.BL.Services.FriendListService
             var friendList =
                 (await _friendRepository.GetAllAsync(friend =>
                     friend.Owner.Id == ownerId, friend => friend.FriendUser))
-                .Select(friend => friend.FriendToFriendReturnDTO()).ToList();
+                //.Select(friend => friend.FriendToFriendReturnDTO())
+                .ToList();
 
-            return friendList;
+            var debts = await (await _debtRepository.GetAllAsync(debt =>
+                    !debt.IsClosed && debt.IsMoney && ((debt.Owner.Id == ownerId) ||
+                    debt.Friend.FriendUser.Id == ownerId && debt.Synchronize))).Include(debt => debt.Owner)
+                .Include(debt => debt.Friend).ThenInclude(friend => friend.FriendUser).ToListAsync();
+
+            var friendRet = friendList.Select(friend => friend.FriendToFriendReturnDTO()).ToList();
+            
+            foreach (var friend in friendList)
+            {
+                decimal toOnwer = 0;
+                decimal fromOnwer = 0;
+
+                if(friend.IsSynchronized)
+                foreach (var debt in debts.Where(debt =>
+                    debt.Owner.Id == friend.FriendUser.Id))
+                {
+                    if (debt.IsOwnerDebter)
+                        toOnwer += debt.Value.Value;
+                    else fromOnwer += debt.Value.Value;
+                }
+
+                foreach (var debt in debts.Where(debt =>
+                    debt.Friend.Id == friend.Id))
+                {
+                    if (debt.IsOwnerDebter)
+                        fromOnwer += debt.Value.Value;
+                    else toOnwer += debt.Value.Value;
+                }
+
+                var test = friendRet.FirstOrDefault(dto => dto.Id == friend.Id);
+                test.Owe1 = toOnwer;
+                test.Owe2 = fromOnwer;
+            }
+
+            return friendRet;
         }
 
         public async Task ApproveInviteAsync(FriendAcceptDTO model)
